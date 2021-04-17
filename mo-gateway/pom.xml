@@ -11,6 +11,12 @@
 
     <artifactId>mo-gateway</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>com.mo</groupId>
+            <artifactId>mo-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>
