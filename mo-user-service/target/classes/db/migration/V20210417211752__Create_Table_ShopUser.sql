@@ -1,6 +1,5 @@
-drop  table  if exists moshop_user;
-
-create table  moshop_user (
+drop  table  if exists mp_user;
+create table  mp_user (
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     user_name  varchar(128) DEFAULT NULL COMMENT '用户名',
     password  varchar(124) DEFAULT NULL COMMENT '密码',
@@ -14,4 +13,4 @@ create table  moshop_user (
     update_time datetime DEFAULT NULL COMMENT '修改时间',
     PRIMARY KEY (id),
     UNIQUE KEY  mail_idx (mail)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
