@@ -1,9 +1,11 @@
 package com.mo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mo.model.MpAddressDO;
 import com.mo.mapper.MpAddressMapper;
 import com.mo.service.MpAddressService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +17,15 @@ import org.springframework.stereotype.Service;
  * @since 2021-04-17
  */
 @Service
-public class MpAddressServiceImpl extends ServiceImpl<MpAddressMapper, MpAddressDO> implements MpAddressService {
+public class MpAddressServiceImpl implements MpAddressService {
 
+    @Autowired
+    private MpAddressMapper addressMapper;
+
+    @Override
+    public MpAddressDO detail(Long id) {
+        MpAddressDO address = addressMapper.selectOne(new QueryWrapper<MpAddressDO>().eq("id", id));
+
+        return address;
+    }
 }

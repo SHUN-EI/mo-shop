@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author mo
  * @since 2021-04-17
  */
-public interface MpAddressService extends IService<MpAddressDO> {
+public interface MpAddressService  {
 
+    MpAddressDO detail(Long id);
 }
