@@ -2,6 +2,9 @@ package com.mo.controller;
 
 
 import com.mo.service.MpAddressService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,16 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
  * @author mo
  * @since 2021-04-17
  */
+@Api(tags = "收货地址模块")
 @RestController
-@RequestMapping("/api/address/v1/")
+@RequestMapping("/api/address/v1")
 public class MpAddressController {
 
     @Autowired
     private MpAddressService addressService;
 
-
+    @ApiOperation("根据id查找地址详情")
     @GetMapping("/find/{address_id}")
-    public  Object detail(@PathVariable("address_id") long addressId){
+    public  Object detail(  @ApiParam(value = "地址id",required = true)
+                            @PathVariable("address_id") long addressId){
         return  addressService.detail(addressId);
     }
 }

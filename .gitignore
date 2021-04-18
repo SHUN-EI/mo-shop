@@ -1,0 +1,13 @@
+/mo-user-service/target/classes/com/mo/controller/MpAddressController.class
+/mo-user-service/target/classes/com/mo/model/MpAddressDO.class
+/mo-user-service/target/classes/com/mo/mapper/MpAddressMapper.class
+/mo-user-service/target/classes/mapper/MpAddressMapper.xml
+/mo-user-service/target/classes/com/mo/service/MpAddressService.class
+/mo-user-service/target/classes/com/mo/service/impl/MpAddressServiceImpl.class
+/mo-user-service/target/classes/com/mo/controller/MpUserController.class
+/mo-user-service/target/classes/com/mo/model/MpUserDO.class
+/mo-user-service/target/classes/com/mo/mapper/MpUserMapper.class
+/mo-user-service/target/classes/mapper/MpUserMapper.xml
+/mo-user-service/target/classes/com/mo/service/MpUserService.class
+/mo-user-service/target/classes/com/mo/service/impl/MpUserServiceImpl.class
+/mo-common/target/classes/com/mo/config/SwaggerConfiguration.class
