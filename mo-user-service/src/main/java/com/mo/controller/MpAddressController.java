@@ -1,7 +1,9 @@
 package com.mo.controller;
 
 
+import com.mo.model.MpAddressDO;
 import com.mo.service.MpAddressService;
+import com.mo.utils.JsonData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,7 +34,9 @@ public class MpAddressController {
     @GetMapping("/find/{address_id}")
     public  Object detail(  @ApiParam(value = "地址id",required = true)
                             @PathVariable("address_id") long addressId){
-        return  addressService.detail(addressId);
+
+        MpAddressDO addressDO = addressService.detail(addressId);
+        return JsonData.buildSuccess(addressDO);
     }
 }
 
