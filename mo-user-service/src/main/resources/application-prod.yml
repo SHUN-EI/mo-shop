@@ -8,6 +8,10 @@ spring:
     url: jdbc:mysql://39.108.182.26:3306/moshop_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: mo12345
+  redis:   #Redis
+    host: 39.108.182.26
+    port: 8000
+    password: 123456
   flyway:
     enabled: true
     encoding: utf-8
