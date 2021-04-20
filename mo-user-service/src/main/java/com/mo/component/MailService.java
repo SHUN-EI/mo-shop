@@ -1,4 +1,4 @@
-package com.mo.service;
+package com.mo.component;
 
 /**
  * Created by mo on 2021/4/20

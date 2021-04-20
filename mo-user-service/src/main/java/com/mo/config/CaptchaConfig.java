@@ -14,7 +14,7 @@ import java.util.Properties;
  * kaptcha验证码配置
  */
 @Configuration
-public class kaptchaConfig {
+public class CaptchaConfig {
 
     /**
      * 验证码配置
@@ -22,7 +22,7 @@ public class kaptchaConfig {
      * @return
      */
     @Bean
-    @Qualifier("kaptchaProducer")
+    @Qualifier("captchaProducer")
     public DefaultKaptcha kaptcha() {
         DefaultKaptcha kaptcha = new DefaultKaptcha();
         Properties properties = new Properties();

@@ -1,6 +1,6 @@
-package com.mo.service.impl;
+package com.mo.component.impl;
 
-import com.mo.service.MailService;
+import com.mo.component.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

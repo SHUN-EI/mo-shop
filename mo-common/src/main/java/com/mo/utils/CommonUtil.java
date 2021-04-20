@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
+import java.util.Random;
+import java.util.TooManyListenersException;
 
 /**
  * Created by mo on 2021/4/20
@@ -12,6 +14,7 @@ public class CommonUtil {
 
     /**
      * 获取ip
+     *
      * @param request
      * @return
      */
@@ -47,7 +50,7 @@ public class CommonUtil {
                 }
             }
         } catch (Exception e) {
-            ipAddress="";
+            ipAddress = "";
         }
         return ipAddress;
     }
@@ -55,10 +58,11 @@ public class CommonUtil {
 
     /**
      * MD5加密
+     *
      * @param data
      * @return
      */
-    public static String MD5(String data)  {
+    public static String MD5(String data) {
         try {
             java.security.MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(data.getBytes("UTF-8"));
@@ -72,5 +76,21 @@ public class CommonUtil {
         }
         return null;
 
+    }
+
+    /**
+     * 获取验证码随机数
+     *
+     * @return
+     */
+    public static String getRandomCode(int length) {
+
+        String sources = "0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(sources.charAt(random.nextInt(9)));
+        }
+        return sb.toString();
     }
 }
