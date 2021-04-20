@@ -20,7 +20,7 @@ public enum BizCodeEnum {
      *验证码
      */
     CODE_TO_ERROR(240001,"接收号码不合规"),
-    CODE_LIMITED(240002,"验证码发送过快"),
+    CODE_LIMITED(240002,"验证码发送过快,请稍后再试"),
     CODE_ERROR(240003,"验证码错误"),
     CODE_CAPTCHA_ERROR(240101,"图形验证码错误"),
 
