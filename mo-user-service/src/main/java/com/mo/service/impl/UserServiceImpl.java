@@ -1,5 +1,6 @@
 package com.mo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.SendCodeEnum;
 import com.mo.exception.BizException;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by mo on 2021/4/21
@@ -80,9 +82,18 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     private Boolean checkUnique(String mail) {
-        return true;
+
+        QueryWrapper<MpUserDO> queryWrapper = new QueryWrapper<MpUserDO>().eq("mail", mail);
+
+        List<MpUserDO> list = userMapper.selectList(queryWrapper);
+
+        return list.size() > 0 ? false : true;
     }
 
+    /**
+     * 用户注册，初始化福利信息
+     * @param userDO
+     */
     private void userRegisterInitTask(MpUserDO userDO) {
 
     }
