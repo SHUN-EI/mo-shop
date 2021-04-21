@@ -8,5 +8,21 @@ import com.mo.utils.JsonData;
  */
 public interface NotifyService {
 
+    /**
+     * 发送验证码
+     * @param sendCodeEnum
+     * @param to
+     * @return
+     */
     JsonData sendCode(SendCodeEnum sendCodeEnum, String to);
+
+    /**
+     * 校验验证码
+     * @param sendCodeEnum
+     * @param to
+     * @param code
+     * @return
+     */
+    Boolean checkCode(SendCodeEnum sendCodeEnum,String to,String code);
+
 }

@@ -59,8 +59,8 @@ public class NotifyServiceImpl implements NotifyService {
 
             //当前时间戳-验证码发送时间戳，如果小于60秒，则不给重复发送
             if (currentTimestamp - ttl < 1000 * 60) {
-                log.info("重复发送验证码,时间间隔:{} 秒",(currentTimestamp-ttl)/1000);
-                return  JsonData.buildResult(BizCodeEnum.CODE_LIMITED);
+                log.info("重复发送验证码,时间间隔:{} 秒", (currentTimestamp - ttl) / 1000);
+                return JsonData.buildResult(BizCodeEnum.CODE_LIMITED);
             }
         }
 
@@ -80,5 +80,25 @@ public class NotifyServiceImpl implements NotifyService {
 
         }
         return JsonData.buildResult(BizCodeEnum.CODE_TO_ERROR);
+    }
+
+    @Override
+    public Boolean checkCode(SendCodeEnum sendCodeEnum, String to, String code) {
+
+        String cacheKey = String.format(CacheKey.CHECK_CODE_KEY, sendCodeEnum.name(), to);
+
+        String cacheValue = redisTemplate.opsForValue().get(cacheKey);
+        if (StringUtils.isNoneBlank(cacheKey)) {
+
+            String cacheCode = cacheValue.split("_")[0];
+            //校验验证码
+            if (cacheCode.equals(code)) {
+                //删除缓存中的验证码
+                redisTemplate.delete(cacheKey);
+                return true;
+            }
+        }
+
+        return false;
     }
 }
