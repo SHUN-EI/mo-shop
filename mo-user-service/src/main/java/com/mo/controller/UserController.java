@@ -2,6 +2,7 @@ package com.mo.controller;
 
 import com.mo.component.FileService;
 import com.mo.enums.BizCodeEnum;
+import com.mo.request.UserLoginRequest;
 import com.mo.request.UserRegisterRequest;
 import com.mo.service.UserService;
 import com.mo.utils.JsonData;
@@ -38,9 +39,17 @@ public class UserController {
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
-    public JsonData register(@ApiParam("用户注册对象")@RequestBody UserRegisterRequest request) {
+    public JsonData register(@ApiParam("用户注册对象") @RequestBody UserRegisterRequest request) {
 
         JsonData jsonData = userService.register(request);
+        return jsonData.buildSuccess(jsonData);
+    }
+
+    @ApiOperation("用户登录")
+    @PostMapping("/login")
+    public JsonData login(@ApiParam("用户登录对象") @RequestBody UserLoginRequest request) {
+
+        JsonData jsonData = userService.login(request);
         return jsonData.buildSuccess(jsonData);
     }
 }

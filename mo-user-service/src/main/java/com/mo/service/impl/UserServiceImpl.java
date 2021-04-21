@@ -6,6 +6,7 @@ import com.mo.enums.SendCodeEnum;
 import com.mo.exception.BizException;
 import com.mo.mapper.MpUserMapper;
 import com.mo.model.MpUserDO;
+import com.mo.request.UserLoginRequest;
 import com.mo.request.UserRegisterRequest;
 import com.mo.service.NotifyService;
 import com.mo.service.UserService;
@@ -32,6 +33,32 @@ public class UserServiceImpl implements UserService {
     private NotifyService notifyService;
     @Autowired
     private MpUserMapper userMapper;
+
+    @Override
+    public JsonData login(UserLoginRequest request) {
+
+        //根据mail去找有没有这记录
+        List<MpUserDO> list = userMapper.selectList(new QueryWrapper<MpUserDO>().eq("mail", request.getMail()));
+
+        if (list != null && list.size() == 1) {
+            //已注册
+            MpUserDO userDO = list.get(0);
+            String cryptPwd = Md5Crypt.md5Crypt(request.getPassword().getBytes(), userDO.getSecret());
+
+            //用密钥+用户传递的明文密码，进行加密，与数据库的密码(密文)进行匹配
+            if (cryptPwd.equals(userDO.getPassword())) {
+                //TODO 登录成功,生成token
+
+                return JsonData.buildSuccess(userDO);
+            } else {
+                return JsonData.buildResult(BizCodeEnum.ACCOUNT_PWD_ERROR);
+            }
+
+        } else {
+            //未注册
+            return JsonData.buildResult(BizCodeEnum.ACCOUNT_UNREGISTER);
+        }
+    }
 
     @Override
     public JsonData register(UserRegisterRequest request) {
@@ -92,6 +119,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 用户注册，初始化福利信息
+     *
      * @param userDO
      */
     private void userRegisterInitTask(MpUserDO userDO) {

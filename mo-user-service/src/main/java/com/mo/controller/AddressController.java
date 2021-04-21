@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "收货地址模块")
 @RestController
 @RequestMapping("/api/address/v1")
-public class MpAddressController {
+public class AddressController {
 
     @Autowired
     private MpAddressService addressService;
