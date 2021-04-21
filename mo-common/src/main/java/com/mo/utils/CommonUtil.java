@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.util.Random;
 import java.util.TooManyListenersException;
+import java.util.UUID;
 
 /**
  * Created by mo on 2021/4/20
@@ -96,9 +97,18 @@ public class CommonUtil {
 
     /**
      * 获取当前时间戳
+     *
      * @return
      */
     public static Long getCurrentTimestamp() {
         return System.currentTimeMillis();
+    }
+
+
+    /**
+     * 自动生成UUID
+     */
+    public static String generateUUID() {
+        return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 32);
     }
 }
