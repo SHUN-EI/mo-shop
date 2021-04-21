@@ -6,11 +6,13 @@ import com.mo.enums.SendCodeEnum;
 import com.mo.exception.BizException;
 import com.mo.mapper.MpUserMapper;
 import com.mo.model.MpUserDO;
+import com.mo.model.UserDTO;
 import com.mo.request.UserLoginRequest;
 import com.mo.request.UserRegisterRequest;
 import com.mo.service.NotifyService;
 import com.mo.service.UserService;
 import com.mo.utils.CommonUtil;
+import com.mo.utils.JWTUtil;
 import com.mo.utils.JsonData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -47,9 +49,13 @@ public class UserServiceImpl implements UserService {
 
             //用密钥+用户传递的明文密码，进行加密，与数据库的密码(密文)进行匹配
             if (cryptPwd.equals(userDO.getPassword())) {
-                //TODO 登录成功,生成token
+                //登录成功,生成token
 
-                return JsonData.buildSuccess(userDO);
+                UserDTO userDTO = new UserDTO();
+                BeanUtils.copyProperties(userDO,userDTO);
+                String token = JWTUtil.generateJsonWebToken(userDTO);
+
+                return JsonData.buildSuccess(token);
             } else {
                 return JsonData.buildResult(BizCodeEnum.ACCOUNT_PWD_ERROR);
             }

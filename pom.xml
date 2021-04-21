@@ -38,6 +38,7 @@
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
         <kaptcha.spring.boot.starter.version>1.1.0</kaptcha.spring.boot.starter.version>
         <aliyun.sdk.oss.version>3.10.2</aliyun.sdk.oss.version>
+        <jwt.version>0.7.0</jwt.version>
 
         <!--镜像打包使用-->
         <docker.image.prefix>mo-cloud</docker.image.prefix>
@@ -135,6 +136,13 @@
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>${aliyun.sdk.oss.version}</version>
+        </dependency>
+
+        <!-- JWT相关 -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jwt.version}</version>
         </dependency>
 
     </dependencies>
