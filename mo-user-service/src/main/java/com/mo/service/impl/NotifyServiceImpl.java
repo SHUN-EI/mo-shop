@@ -37,12 +37,12 @@ public class NotifyServiceImpl implements NotifyService {
     /**
      * 验证码的内容
      */
-    private static final String CONTENT = "您的验证码是%s,有效时间是60s,打死都不要告诉别人哦";
+    private static final String CONTENT = "您的验证码是%s,有效时间是5分钟,打死都不要告诉别人哦";
 
     /**
      * 验证码过期时间，10min有效
      */
-    private static final int CODE_EXPIRED = 60 * 1000 * 10;
+    private static final int CODE_EXPIRED = 60 * 1000 * 5;
 
     @Override
     public JsonData sendCode(SendCodeEnum sendCodeEnum, String to) {

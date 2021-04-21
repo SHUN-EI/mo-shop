@@ -8,8 +8,10 @@ import com.mo.model.MpUserDO;
 import com.mo.request.UserRegisterRequest;
 import com.mo.service.NotifyService;
 import com.mo.service.UserService;
+import com.mo.utils.CommonUtil;
 import com.mo.utils.JsonData;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,15 +52,38 @@ public class UserServiceImpl implements UserService {
         userDO.setUpdateTime(new Date());
         userDO.setSlogan("人生需要动态规划，学习需要贪心算法");
 
+        //生成用户密码的密钥，盐
+        userDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
+        //密码加密, 密码+盐处理
+        String cryptPwd = Md5Crypt.md5Crypt(request.getPassword().getBytes(), userDO.getSecret());
+        userDO.setPassword(cryptPwd);
+
         //账号唯一性检查
+        if (checkUnique(userDO.getMail())) {
 
-        int rows = userMapper.insert(userDO);
-        log.info("rows:{},注册成功:{}",rows,userDO.toString());
+            int rows = userMapper.insert(userDO);
+            log.info("rows:{},注册成功:{}", rows, userDO.toString());
 
-        //密码加密
+            //TODO 新用户注册成功，初始化信息，福利发放
+            userRegisterInitTask(userDO);
 
-        //TODO 新用户注册成功，初始化信息，福利发放
+            return JsonData.buildSuccess(userDO);
+        } else {
+            return JsonData.buildResult(BizCodeEnum.ACCOUNT_REPEAT);
+        }
+    }
 
-        return null;
+    /**
+     * 校验用户账号唯一
+     *
+     * @param mail
+     * @return
+     */
+    private Boolean checkUnique(String mail) {
+        return true;
+    }
+
+    private void userRegisterInitTask(MpUserDO userDO) {
+
     }
 }
