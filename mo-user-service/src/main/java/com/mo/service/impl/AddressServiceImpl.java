@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -31,6 +33,23 @@ public class AddressServiceImpl implements MpAddressService {
 
     @Autowired
     private MpAddressMapper addressMapper;
+
+    @Override
+    public List<AddressVO> list() {
+        //获取当前登录用户
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        List<MpAddressDO> list = addressMapper.selectList(new QueryWrapper<MpAddressDO>()
+                .eq("user_id", loginUserDTO.getId()));
+
+        List<AddressVO> addressVOList = list.stream().map(obj -> {
+            AddressVO addressVO = new AddressVO();
+            BeanUtils.copyProperties(obj, addressVO);
+            return addressVO;
+        }).collect(Collectors.toList());
+
+        return addressVOList;
+    }
 
     @Override
     public int delete(long addressId) {

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.mo.request.AddressAddRequest;
 import com.mo.vo.AddressVO;
 
+import java.util.List;
+
 /**
  * <p>
  * 收发货地址表 服务类
@@ -20,4 +22,6 @@ public interface MpAddressService {
     void add(AddressAddRequest request);
 
     int delete(long addressId);
+
+    List<AddressVO> list();
 }

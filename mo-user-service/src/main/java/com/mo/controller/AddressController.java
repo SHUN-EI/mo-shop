@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * <p>
  * 收发货地址表 前端控制器
@@ -29,6 +31,13 @@ public class AddressController {
     @Autowired
     private MpAddressService addressService;
 
+
+    @ApiOperation("查询用户的全部收货地址")
+    @GetMapping("/list")
+    public JsonData findAllAddress() {
+        List<AddressVO> list = addressService.list();
+        return JsonData.buildSuccess(list);
+    }
 
     @ApiOperation("根据id删除指定的收货地址")
     @DeleteMapping("/del/{address_id}")
