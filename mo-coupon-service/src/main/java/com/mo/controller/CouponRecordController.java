@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-04-22
  */
 @RestController
-@RequestMapping("/mpCouponRecordDO")
+@RequestMapping("/api/coupon_record/v1")
 public class CouponRecordController {
 
 }
