@@ -3,6 +3,7 @@ package com.mo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.SendCodeEnum;
+import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.MpUserMapper;
 import com.mo.model.MpUserDO;
 import com.mo.model.LoginUserDTO;
@@ -13,6 +14,7 @@ import com.mo.service.UserService;
 import com.mo.utils.CommonUtil;
 import com.mo.utils.JWTUtil;
 import com.mo.utils.JsonData;
+import com.mo.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +38,21 @@ public class UserServiceImpl implements UserService {
     private MpUserMapper userMapper;
 
     @Override
+    public UserVO findUserDetail() {
+
+        //在threadlocal里面取
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        MpUserDO userDO = userMapper.selectOne(new QueryWrapper<MpUserDO>().eq("id", loginUserDTO.getId()));
+
+        //返回前端数据
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userDO, userVO);
+
+        return userVO;
+    }
+
+    @Override
     public JsonData login(UserLoginRequest request) {
 
         //根据mail去找有没有这记录
@@ -50,6 +67,8 @@ public class UserServiceImpl implements UserService {
             if (cryptPwd.equals(userDO.getPassword())) {
                 //登录成功,生成token
 
+                //Lombok写法，需要添加@Builder注解
+                // LoginUserDTO build = LoginUserDTO.builder().build();
                 LoginUserDTO loginUserDTO = new LoginUserDTO();
                 BeanUtils.copyProperties(userDO, loginUserDTO);
                 String token = JWTUtil.generateJsonWebToken(loginUserDTO);

@@ -17,9 +17,9 @@ import java.util.Date;
 public class JWTUtil {
 
     /**
-     * token过期时间，默认为7天
+     * token过期时间，默认为7天,方便测试，改为70天
      */
-    private static final long EXPIRED = 1000 * 60 * 60 * 24 * 7;
+    private static final long EXPIRED = 1000 * 60 * 60 * 24 * 7 * 10;
 
     /**
      * 加密的密钥
@@ -67,6 +67,7 @@ public class JWTUtil {
 
     /**
      * 校验token的方法
+     *
      * @param token
      * @return
      */

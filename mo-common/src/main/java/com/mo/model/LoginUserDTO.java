@@ -9,6 +9,7 @@ import lombok.Data;
  * 用户登录对象
  */
 @Data
+@Builder
 public class LoginUserDTO {
 
     /**

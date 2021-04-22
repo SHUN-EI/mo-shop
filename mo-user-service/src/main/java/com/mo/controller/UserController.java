@@ -6,6 +6,7 @@ import com.mo.request.UserLoginRequest;
 import com.mo.request.UserRegisterRequest;
 import com.mo.service.UserService;
 import com.mo.utils.JsonData;
+import com.mo.vo.UserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -51,5 +52,13 @@ public class UserController {
 
         JsonData jsonData = userService.login(request);
         return jsonData.buildSuccess(jsonData);
+    }
+
+    @ApiOperation("用户信息查询")
+    @GetMapping("/detail")
+    public JsonData findUserDetail() {
+
+        UserVO userVO = userService.findUserDetail();
+        return JsonData.buildSuccess(userVO);
     }
 }
