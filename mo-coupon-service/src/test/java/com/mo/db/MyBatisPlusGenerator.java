@@ -26,7 +26,7 @@ public class MyBatisPlusGenerator {
                 // 生成路径，最好使用绝对路径，window路径是不一样的
                 //TODO  TODO  TODO  TODO
 //                .setOutputDir("/Users/xdclass/Desktop/demo/src/main/java") //这是绝对路径,可以存放在一个另外的目录下，然后再复制进项目
-                .setOutputDir("mo-user-service/src/main/java")//相对路径
+                .setOutputDir("mo-coupon-service/src/main/java")//相对路径
                 // 文件覆盖
                 .setFileOverride(true)
                 // 主键策略
@@ -54,9 +54,9 @@ public class MyBatisPlusGenerator {
         dsConfig.setDbType(DbType.MYSQL)
                 .setDriverName("com.mysql.cj.jdbc.Driver")
                 //TODO  TODO  TODO  TODO
-                .setUrl("jdbc:mysql://192.168.151.99:3306/moshop_user?useSSL=false")
+                .setUrl("jdbc:mysql://39.108.182.26:3306/moshop_coupon?useSSL=false")
                 .setUsername("root")
-                .setPassword("root");
+                .setPassword("mo12345");
 
         //3. 策略配置globalConfiguration中
         StrategyConfig stConfig = new StrategyConfig();
@@ -74,7 +74,7 @@ public class MyBatisPlusGenerator {
 
                 // 生成的表, 支持多表一起生成，以数组形式填写
                 //TODO  TODO  TODO  TODO
-                .setInclude("mp_user","mp_address");
+                .setInclude("mp_coupon","mp_coupon_record");
 
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
@@ -94,6 +94,6 @@ public class MyBatisPlusGenerator {
 
         //6. 执行操作
         ag.execute();
-        System.out.println("======= MoShop-User-Service Done 相关代码生成完毕  ========");
+        System.out.println("======= MoShop-Coupon-Service Done 相关代码生成完毕  ========");
     }
 }

@@ -13,5 +13,11 @@
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://39.108.182.26:3306/moshop_user</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="moshop_coupon@ali-test" uuid="30780859-da5e-43bb-8449-3aceba01b4db">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://39.108.182.26:3306/moshop_coupon</jdbc-url>
+    </data-source>
   </component>
 </project>
