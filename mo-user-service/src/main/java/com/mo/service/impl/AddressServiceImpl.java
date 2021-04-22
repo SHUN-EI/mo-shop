@@ -22,10 +22,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * <p>
- * 收发货地址表 服务实现类
- * </p>
- *
  * @author mo
  * @since 2021-04-17
  */
@@ -39,7 +35,7 @@ public class AddressServiceImpl implements MpAddressService {
 
     @Override
     public List<AddressVO> list() {
-        //获取当前登录用户
+        //获取当前用户信息，防止越权查询
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
 
         List<MpAddressDO> list = addressMapper.selectList(new QueryWrapper<MpAddressDO>()
@@ -54,9 +50,10 @@ public class AddressServiceImpl implements MpAddressService {
         return addressVOList;
     }
 
-    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public int delete(long addressId) {
+        //获取当前用户信息，防止越权删除
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
 
         int rows = addressMapper.delete(new QueryWrapper<MpAddressDO>()
@@ -66,7 +63,7 @@ public class AddressServiceImpl implements MpAddressService {
         return rows;
     }
 
-    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public void add(AddressAddRequest request) {
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
@@ -100,7 +97,11 @@ public class AddressServiceImpl implements MpAddressService {
 
     @Override
     public AddressVO detail(Long id) {
-        MpAddressDO address = addressMapper.selectOne(new QueryWrapper<MpAddressDO>().eq("id", id));
+        //获取当前用户信息，防止越权查询
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+        MpAddressDO address = addressMapper.selectOne(new QueryWrapper<MpAddressDO>()
+                .eq("id", id)
+                .eq("user_id", loginUserDTO.getId()));
 
         if (null == address) {
             return null;

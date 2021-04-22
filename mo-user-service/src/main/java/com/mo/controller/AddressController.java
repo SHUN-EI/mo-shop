@@ -16,9 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * <p>
- * 收发货地址表 前端控制器
- * </p>
  *
  * @author mo
  * @since 2021-04-17
