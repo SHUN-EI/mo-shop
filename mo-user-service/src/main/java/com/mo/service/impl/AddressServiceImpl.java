@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -34,6 +36,7 @@ public class AddressServiceImpl implements MpAddressService {
     @Autowired
     private MpAddressMapper addressMapper;
 
+
     @Override
     public List<AddressVO> list() {
         //获取当前登录用户
@@ -51,6 +54,7 @@ public class AddressServiceImpl implements MpAddressService {
         return addressVOList;
     }
 
+    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
     @Override
     public int delete(long addressId) {
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
@@ -62,6 +66,7 @@ public class AddressServiceImpl implements MpAddressService {
         return rows;
     }
 
+    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
     @Override
     public void add(AddressAddRequest request) {
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
