@@ -1,7 +1,7 @@
 package com.mo.interceptor;
 
 import com.mo.enums.BizCodeEnum;
-import com.mo.model.UserDTO;
+import com.mo.model.LoginUserDTO;
 import com.mo.utils.CommonUtil;
 import com.mo.utils.JWTUtil;
 import com.mo.utils.JsonData;
@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
 
-    private static ThreadLocal<UserDTO> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<LoginUserDTO> threadLocal = new ThreadLocal<>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -45,13 +45,13 @@ public class LoginInterceptor implements HandlerInterceptor {
             String mail = (String) claims.get("mail");
             String headImg = (String) claims.get("head_img");
 
-            UserDTO userDTO = new UserDTO(userId, userName, headImg, mail);
+            LoginUserDTO loginUserDTO = new LoginUserDTO(userId, userName, headImg, mail);
 
             //通过 attribute传递用户信息
             //request.setAttribute("LoginUserDTO", userDTO);
 
             //通过threadLocal 传递用户登录信息
-            threadLocal.set(userDTO);
+            threadLocal.set(loginUserDTO);
 
             return true;
 

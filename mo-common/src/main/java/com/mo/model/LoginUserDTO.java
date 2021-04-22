@@ -6,9 +6,10 @@ import lombok.Data;
 
 /**
  * Created by mo on 2021/4/21
+ * 用户登录对象
  */
 @Data
-public class UserDTO {
+public class LoginUserDTO {
 
     /**
      * 用户id
@@ -28,7 +29,9 @@ public class UserDTO {
      */
     private String mail;
 
-    public UserDTO(Long id, String userName, String headImg, String mail) {
+    public LoginUserDTO(){}
+
+    public LoginUserDTO(Long id, String userName, String headImg, String mail) {
 
         this.id = id;
         this.userName = userName;

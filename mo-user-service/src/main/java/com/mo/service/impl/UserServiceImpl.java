@@ -3,10 +3,9 @@ package com.mo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.SendCodeEnum;
-import com.mo.exception.BizException;
 import com.mo.mapper.MpUserMapper;
 import com.mo.model.MpUserDO;
-import com.mo.model.UserDTO;
+import com.mo.model.LoginUserDTO;
 import com.mo.request.UserLoginRequest;
 import com.mo.request.UserRegisterRequest;
 import com.mo.service.NotifyService;
@@ -51,9 +50,9 @@ public class UserServiceImpl implements UserService {
             if (cryptPwd.equals(userDO.getPassword())) {
                 //登录成功,生成token
 
-                UserDTO userDTO = new UserDTO();
-                BeanUtils.copyProperties(userDO,userDTO);
-                String token = JWTUtil.generateJsonWebToken(userDTO);
+                LoginUserDTO loginUserDTO = new LoginUserDTO();
+                BeanUtils.copyProperties(userDO, loginUserDTO);
+                String token = JWTUtil.generateJsonWebToken(loginUserDTO);
 
                 return JsonData.buildSuccess(token);
             } else {

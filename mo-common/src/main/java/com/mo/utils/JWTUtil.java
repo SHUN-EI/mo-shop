@@ -2,7 +2,7 @@ package com.mo.utils;
 
 import com.mo.enums.BizCodeEnum;
 import com.mo.exception.BizException;
-import com.mo.model.UserDTO;
+import com.mo.model.LoginUserDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -43,7 +43,7 @@ public class JWTUtil {
      * @param user
      * @return
      */
-    public static String generateJsonWebToken(UserDTO user) {
+    public static String generateJsonWebToken(LoginUserDTO user) {
 
         if (null == user) {
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
