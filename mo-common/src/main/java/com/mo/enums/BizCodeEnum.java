@@ -33,6 +33,14 @@ public enum BizCodeEnum {
     ACCOUNT_UNLOGIN(250004, "账号未登录"),
 
     /**
+     * 收货地址
+     */
+    ADDRESS_ADD_FAIL(290001,"新增收货地址失败"),
+    ADDRESS_DEL_FAIL(290002,"删除收货地址失败"),
+    ADDRESS_NOT_EXIST(290003,"收货地址不存在"),
+
+
+    /**
      * 文件相关
      */
     FILE_UPLOAD_USER_IMG_FAILED(600001, "用户头像文件上传失败");

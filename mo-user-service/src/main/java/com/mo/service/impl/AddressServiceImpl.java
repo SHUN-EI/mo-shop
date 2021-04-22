@@ -9,6 +9,7 @@ import com.mo.mapper.MpAddressMapper;
 import com.mo.request.AddressAddRequest;
 import com.mo.service.MpAddressService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mo.vo.AddressVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,21 @@ import java.util.Date;
  */
 @Slf4j
 @Service
-public class MpAddressServiceImpl implements MpAddressService {
+public class AddressServiceImpl implements MpAddressService {
 
     @Autowired
     private MpAddressMapper addressMapper;
+
+    @Override
+    public int delete(long addressId) {
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        int rows = addressMapper.delete(new QueryWrapper<MpAddressDO>()
+                .eq("id", addressId)
+                .eq("user_id", loginUserDTO.getId()));
+
+        return rows;
+    }
 
     @Override
     public void add(AddressAddRequest request) {
@@ -63,9 +75,16 @@ public class MpAddressServiceImpl implements MpAddressService {
     }
 
     @Override
-    public MpAddressDO detail(Long id) {
+    public AddressVO detail(Long id) {
         MpAddressDO address = addressMapper.selectOne(new QueryWrapper<MpAddressDO>().eq("id", id));
 
-        return address;
+        if (null == address) {
+            return null;
+        }
+
+        AddressVO addressVO = new AddressVO();
+        BeanUtils.copyProperties(address, addressVO);
+
+        return addressVO;
     }
 }

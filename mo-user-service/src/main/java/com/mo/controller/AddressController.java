@@ -1,10 +1,12 @@
 package com.mo.controller;
 
 
+import com.mo.enums.BizCodeEnum;
 import com.mo.model.MpAddressDO;
 import com.mo.request.AddressAddRequest;
 import com.mo.service.MpAddressService;
 import com.mo.utils.JsonData;
+import com.mo.vo.AddressVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,6 +29,18 @@ public class AddressController {
     @Autowired
     private MpAddressService addressService;
 
+
+    @ApiOperation("根据id删除指定的收货地址")
+    @DeleteMapping("/del/{address_id}")
+    public JsonData delete(@ApiParam(value = "地址id", required = true)
+                           @PathVariable("address_id") long addressId) {
+
+        int rows = addressService.delete(addressId);
+
+        return rows == 1 ? JsonData.buildSuccess() : JsonData.buildResult(BizCodeEnum.ADDRESS_DEL_FAIL);
+
+    }
+
     @ApiOperation("新增收货地址")
     @PostMapping("/add")
     public JsonData add(@ApiParam("地址对象") @RequestBody AddressAddRequest request) {
@@ -42,8 +56,8 @@ public class AddressController {
     public JsonData detail(@ApiParam(value = "地址id", required = true)
                            @PathVariable("address_id") long addressId) {
 
-        MpAddressDO addressDO = addressService.detail(addressId);
-        return JsonData.buildSuccess(addressDO);
+        AddressVO addressVO = addressService.detail(addressId);
+        return addressVO == null ? JsonData.buildResult(BizCodeEnum.ADDRESS_NOT_EXIST) : JsonData.buildSuccess(addressVO);
     }
 }
 

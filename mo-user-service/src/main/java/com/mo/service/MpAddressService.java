@@ -3,6 +3,7 @@ package com.mo.service;
 import com.mo.model.MpAddressDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mo.request.AddressAddRequest;
+import com.mo.vo.AddressVO;
 
 /**
  * <p>
@@ -14,7 +15,9 @@ import com.mo.request.AddressAddRequest;
  */
 public interface MpAddressService {
 
-    MpAddressDO detail(Long id);
+    AddressVO detail(Long id);
 
     void add(AddressAddRequest request);
+
+    int delete(long addressId);
 }
