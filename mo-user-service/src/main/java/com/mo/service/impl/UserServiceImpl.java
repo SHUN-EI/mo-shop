@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO findUserDetail() {
 
-        //在threadlocal里面取
+        //根据token在threadlocal里面取
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
 
         MpUserDO userDO = userMapper.selectOne(new QueryWrapper<MpUserDO>().eq("id", loginUserDTO.getId()));
