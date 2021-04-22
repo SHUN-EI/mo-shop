@@ -1,17 +1,14 @@
 package com.mo.controller;
 
 
+import com.mo.enums.CouponCategoryEnum;
 import com.mo.service.CouponService;
 import com.mo.utils.JsonData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -26,6 +23,17 @@ public class CouponController {
 
     @Autowired
     private CouponService couponService;
+
+    @ApiOperation("领取优惠券")
+    @GetMapping("/add/promotion/{coupon_id}")
+    public JsonData addPromotionCoupon(@ApiParam(value = "优惠券id", required = true)
+                                       @PathVariable("coupon_id") Long couponId) {
+
+        JsonData jsonData = couponService.addPromotionCoupon(couponId, CouponCategoryEnum.PROMOTION);
+
+        return JsonData.buildSuccess(jsonData);
+
+    }
 
     @ApiOperation("分页查询优惠券列表")
     @GetMapping("/page_coupon")

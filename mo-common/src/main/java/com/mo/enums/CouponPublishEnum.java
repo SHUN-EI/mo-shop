@@ -4,7 +4,7 @@ package com.mo.enums;
  * Created by mo on 2021/4/23
  * 优惠券状态
  */
-public enum CouponEnum {
+public enum CouponPublishEnum {
 
     /**
      *发布
