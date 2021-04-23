@@ -1,13 +1,17 @@
 server:
-  port: 9001
+  port: 9002
 spring:
   application:
-    name: mo-user-service
+    name: mo-coupon-service
   datasource: #数据库配置
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.151.99:3306/moshop_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.168.151.99:3306/moshop_coupon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: root
+  redis:   #Redis
+    host: 127.0.0.1
+    port: 8000
+    password: 123456
   flyway:
     enabled: true
     encoding: utf-8
