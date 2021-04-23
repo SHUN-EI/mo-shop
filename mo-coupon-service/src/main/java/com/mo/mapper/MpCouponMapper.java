@@ -2,6 +2,7 @@ package com.mo.mapper;
 
 import com.mo.model.MpCouponDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MpCouponMapper extends BaseMapper<MpCouponDO> {
 
+    int reduceStock(@Param("couponId") Long couponId);
 }

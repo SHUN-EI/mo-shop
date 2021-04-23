@@ -4,25 +4,30 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.mo.model.MpCouponDO">
-        <id column="id" property="id" />
-        <result column="category" property="category" />
-        <result column="publish" property="publish" />
-        <result column="coupon_img" property="couponImg" />
-        <result column="coupon_title" property="couponTitle" />
-        <result column="price" property="price" />
-        <result column="user_limit" property="userLimit" />
-        <result column="start_time" property="startTime" />
-        <result column="end_time" property="endTime" />
-        <result column="publish_count" property="publishCount" />
-        <result column="stock" property="stock" />
-        <result column="condition_price" property="conditionPrice" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="category" property="category"/>
+        <result column="publish" property="publish"/>
+        <result column="coupon_img" property="couponImg"/>
+        <result column="coupon_title" property="couponTitle"/>
+        <result column="price" property="price"/>
+        <result column="user_limit" property="userLimit"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="publish_count" property="publishCount"/>
+        <result column="stock" property="stock"/>
+        <result column="condition_price" property="conditionPrice"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, category, publish, coupon_img, coupon_title, price, user_limit, start_time, end_time, publish_count, stock, condition_price, create_time, update_time
     </sql>
+
+    <!--扣减库存-->
+    <update id="reduceStock">
+        update mp_coupon set stock=stock-1 where id = #{couponId}
+    </update>
 
 </mapper>

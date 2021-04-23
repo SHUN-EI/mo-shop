@@ -77,10 +77,17 @@ public class CouponServiceImpl implements CouponService {
         couponRecordDO.setCouponId(couponId);
         couponRecordDO.setId(null);//copyProperties会把id拷贝，这里需要置null
 
-
         //TODO 扣减优惠券库存
         //高并发下扣减劵库存，采用乐观锁,当前stock做版本号,延伸多种防止超卖的问题,一次只能领取1张
+        int rows = couponMapper.reduceStock(couponId);
 
+        if (1 == rows) {
+            //优惠券库存扣减成功才保存优惠券领劵记录
+            couponRecordMapper.insert(couponRecordDO);
+        } else {
+            log.warn("领取优惠券失败:{},用户:{}", couponDO, loginUserDTO);
+            throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
+        }
 
         return JsonData.buildSuccess();
     }
