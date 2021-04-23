@@ -25,9 +25,9 @@
         id, category, publish, coupon_img, coupon_title, price, user_limit, start_time, end_time, publish_count, stock, condition_price, create_time, update_time
     </sql>
 
-    <!--扣减库存-->
+    <!--扣减库存，如果别人补充库存，则可能存在ABA问题-->
     <update id="reduceStock">
-        update mp_coupon set stock=stock-1 where id = #{couponId}
+        update mp_coupon set stock=stock-1 where id = #{couponId} and stock>0
     </update>
 
 </mapper>
