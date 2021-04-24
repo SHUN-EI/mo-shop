@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +59,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponCategoryEnum
      * @return
      */
+    @Transactional(rollbackFor=Exception.class,propagation= Propagation.REQUIRED)
     @Override
     public JsonData addPromotionCoupon(Long couponId, CouponCategoryEnum couponCategoryEnum) {
 
@@ -65,8 +68,12 @@ public class CouponServiceImpl implements CouponService {
         String lockKey = "lock:coupon:" + couponId;
         RLock lock = redissonClient.getLock(lockKey);
         //阻塞式等待，一个线程获取锁后，其他线程只能等待，和原生的方式循环调用不一样
+        //锁的过期时间默认为30s，有 watch dog功能
         lock.lock();
         log.info("领券接口加锁成功:{}", Thread.currentThread().getId());
+
+        //锁设置30s过期，没有watch dog功能，无法自动续期，无需unlock()
+        //lock.lock(30,TimeUnit.SECONDS);
 
         //执行领券相关逻辑
         //判断获取优惠券是否存在
