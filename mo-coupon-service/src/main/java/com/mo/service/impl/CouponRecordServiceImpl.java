@@ -32,6 +32,33 @@ public class CouponRecordServiceImpl implements CouponRecordService {
     @Autowired
     private MpCouponRecordMapper couponRecordMapper;
 
+    /**
+     * 查询优惠券记录信息
+     * 水平权限攻击：也叫作访问控制攻击,Web应用程序接收到用户请求，修改某条数据时，没有判断数据的所属人，
+     * 或者在判断数据所属人时从用户提交的表单参数中获取了userid。
+     * 导致攻击者可以自行修改userid修改不属于自己的数据
+     *
+     * @param recordId
+     * @return
+     */
+    @Override
+    public CouponRecordVO findById(Long recordId) {
+
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        MpCouponRecordDO couponRecordDO = couponRecordMapper.selectOne(new QueryWrapper<MpCouponRecordDO>()
+                .eq("id", recordId)
+                .eq("user_id", loginUserDTO.getId()));
+
+        if (null == couponRecordDO)
+            return null;
+
+        CouponRecordVO couponRecordVO = new CouponRecordVO();
+        BeanUtils.copyProperties(couponRecordDO, couponRecordVO);
+
+        return couponRecordVO;
+    }
+
     @Override
     public Map<String, Object> pageCouponRecord(int page, int size) {
 

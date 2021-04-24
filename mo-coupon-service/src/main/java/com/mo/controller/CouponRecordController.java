@@ -1,17 +1,15 @@
 package com.mo.controller;
 
 
+import com.mo.enums.BizCodeEnum;
 import com.mo.service.CouponRecordService;
 import com.mo.utils.JsonData;
+import com.mo.vo.CouponRecordVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -24,9 +22,17 @@ import java.util.Map;
 @RequestMapping("/api/coupon_record/v1")
 public class CouponRecordController {
 
-
     @Autowired
     private CouponRecordService couponRecordService;
+
+    @ApiOperation("查询优惠券领券记录详情")
+    @GetMapping("/detail/{record_id}")
+    public JsonData findUserCouponRecord(@PathVariable("record_id") Long recordId) {
+
+        CouponRecordVO couponRecordVO = couponRecordService.findById(recordId);
+        return couponRecordVO == null ? JsonData.buildResult(BizCodeEnum.COUPON_NO_EXITS)
+                : JsonData.buildSuccess(couponRecordVO);
+    }
 
     @ApiOperation("分页查询优惠券领券记录列表")
     @GetMapping("/page_coupon_record")
