@@ -38,7 +38,21 @@ public class CartServiceImpl implements CartService {
     private RedisTemplate redisTemplate;
 
     /**
+     * 删除购物车商品
+     * @param productId
+     */
+    @Override
+    public void deleteItem(Long productId) {
+
+        //获取购物车
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+        myCart.delete(productId);
+
+    }
+
+    /**
      * 查看我的购物车
+     *
      * @return
      */
     @Override
@@ -66,6 +80,7 @@ public class CartServiceImpl implements CartService {
 
     /**
      * 添加商品到购物车
+     *
      * @param request
      */
     @Override

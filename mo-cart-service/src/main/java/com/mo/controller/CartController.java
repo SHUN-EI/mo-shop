@@ -22,6 +22,15 @@ public class CartController {
     private CartService cartService;
 
 
+    @ApiOperation("删除购物车商品")
+    @DeleteMapping("/delete/{product_id}")
+    public JsonData deleteItem(@ApiParam(value = "商品id", required = true) @PathVariable("product_id") Long productId) {
+
+        cartService.deleteItem(productId);
+        return JsonData.buildSuccess();
+    }
+
+
     @ApiOperation("查看我的购物车")
     @GetMapping("/findMyCart")
     public JsonData findMyCart() {

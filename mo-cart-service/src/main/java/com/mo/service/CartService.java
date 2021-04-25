@@ -13,4 +13,6 @@ public interface CartService {
     void clean();
 
     CartVO findMyCart();
+
+    void deleteItem(Long productId);
 }
