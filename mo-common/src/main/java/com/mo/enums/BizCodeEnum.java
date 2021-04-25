@@ -17,6 +17,11 @@ public enum BizCodeEnum {
     OPS_REPEAT(110001, "重复操作"),
 
     /**
+     * 购物车
+     */
+    CART_FAIL(220001,"添加购物车失败"),
+
+    /**
      * 验证码
      */
     CODE_TO_ERROR(240001, "接收号码不合规"),
