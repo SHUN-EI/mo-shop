@@ -31,6 +31,12 @@ public class CartServiceImpl implements CartService {
     private RedisTemplate redisTemplate;
 
     @Override
+    public void clean() {
+        String cartKey = getCartKey();
+        redisTemplate.delete(cartKey);
+    }
+
+    @Override
     public void addToCart(CartItemRequest request) {
 
         Long productId = request.getProductId();

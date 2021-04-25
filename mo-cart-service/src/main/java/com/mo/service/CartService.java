@@ -8,4 +8,6 @@ import com.mo.request.CartItemRequest;
 public interface CartService {
 
     void addToCart(CartItemRequest request);
+
+    void clean();
 }
