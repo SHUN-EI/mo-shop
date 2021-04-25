@@ -107,6 +107,13 @@
             <artifactId>redisson</artifactId>
         </dependency>
 
+        <!--fastjson,引入alibabacloud之后自带这个包，可以删除 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.75</version>
+        </dependency>
+
     </dependencies>
 
 </project>

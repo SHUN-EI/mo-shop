@@ -1,8 +1,8 @@
 server:
-  port: 9003
+  port: 9004
 spring:
   application:
-    name: mo-product-service
+    name: mo-cart-service
   datasource: #数据库配置
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://192.168.151.99:3306/moshop_product?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
