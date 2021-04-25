@@ -38,7 +38,32 @@ public class CartServiceImpl implements CartService {
     private RedisTemplate redisTemplate;
 
     /**
+     * 修改购物车商品数量
+     *
+     * @param request
+     */
+    @Override
+    public void changeItemNum(CartItemRequest request) {
+
+        Long productId = request.getProductId();
+        //获取购物车
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+        //根据商品id取商品数据
+        Object cacheObj = myCart.get(productId);
+
+        if (null == cacheObj) {
+            throw new BizException(BizCodeEnum.PRODUCT_NOT_EXISTS);
+        }
+
+        String item = (String) cacheObj;
+        CartItemVO cartItemVO = JSON.parseObject(item, CartItemVO.class);
+        cartItemVO.setBuyNum(request.getBuyNum());
+        myCart.put(productId, JSON.toJSONString(cartItemVO));
+    }
+
+    /**
      * 删除购物车商品
+     *
      * @param productId
      */
     @Override

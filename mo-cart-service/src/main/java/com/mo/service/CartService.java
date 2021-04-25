@@ -15,4 +15,6 @@ public interface CartService {
     CartVO findMyCart();
 
     void deleteItem(Long productId);
+
+    void changeItemNum(CartItemRequest request);
 }

@@ -21,6 +21,13 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+    @ApiOperation("修改购物车商品数量")
+    @PostMapping("/changeItemNum")
+    public JsonData changeItemNum(@ApiParam("购物车商品对象") @RequestBody CartItemRequest request) {
+
+        cartService.changeItemNum(request);
+        return JsonData.buildSuccess();
+    }
 
     @ApiOperation("删除购物车商品")
     @DeleteMapping("/delete/{product_id}")

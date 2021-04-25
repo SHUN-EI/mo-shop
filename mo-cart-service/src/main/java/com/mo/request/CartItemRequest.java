@@ -7,6 +7,7 @@ import lombok.Data;
 
 /**
  * Created by mo on 2021/4/25
+ * 可以使用hibernate validator做参数校验
  */
 @ApiModel(value = "购物车商品对象", description = "购物车商品请求对象")
 @Data
