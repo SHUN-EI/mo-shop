@@ -18,6 +18,7 @@
         <module>mo-order-service</module>
         <module>mo-coupon-service</module>
         <module>mo-gateway</module>
+        <module>mo-cart-service</module>
     </modules>
 
     <properties>
