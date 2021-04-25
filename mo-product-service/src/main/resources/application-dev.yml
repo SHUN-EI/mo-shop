@@ -1,0 +1,29 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: mo-coupon-service
+  datasource: #数据库配置
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.151.99:3306/moshop_coupon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  redis:   #Redis
+    host: 127.0.0.1
+    port: 8000
+    password: 123456
+  flyway:
+    enabled: true
+    encoding: utf-8
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    out-of-order: true
+    table: flyway_schema_version_history
+#配置plus打印sql日志
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#设置日志级别,ERROR/WARN/INFO/DEBUG,默认是INFO以上才显示
+logging:
+  level:
+    root: INFO
