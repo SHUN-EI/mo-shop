@@ -3,6 +3,7 @@ package com.mo.controller;
 import com.mo.request.CartItemRequest;
 import com.mo.service.CartService;
 import com.mo.utils.JsonData;
+import com.mo.vo.CartVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,6 +21,14 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+
+    @ApiOperation("查看我的购物车")
+    @GetMapping("/findMyCart")
+    public JsonData findMyCart() {
+
+        CartVO cartVO = cartService.findMyCart();
+        return JsonData.buildSuccess(cartVO);
+    }
 
     @ApiOperation("清空购物车")
     @DeleteMapping("/clean")

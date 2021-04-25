@@ -29,6 +29,20 @@ public class MpProductServiceImpl implements MpProductService {
 
 
     @Override
+    public List<ProductVO> findProductByIdBatch(List<Long> productIds) {
+
+        //根据id批量查询商品
+        List<MpProductDO> productDOList = productMapper.selectList(new QueryWrapper<MpProductDO>().in("id", productIds));
+        List<ProductVO> productVOList = productDOList.stream().map(obj -> {
+            ProductVO productVO = new ProductVO();
+            BeanUtils.copyProperties(obj, productVO);
+            return productVO;
+        }).collect(Collectors.toList());
+
+        return productVOList;
+    }
+
+    @Override
     public ProductVO findById(Long productId) {
 
         MpProductDO productDO = productMapper.selectOne(new QueryWrapper<MpProductDO>().eq("id", productId));
