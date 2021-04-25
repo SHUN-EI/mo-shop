@@ -24,8 +24,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("mp_product_detail")
-public class MpProductDetailDO implements Serializable {
+@TableName("mp_order_detail")
+public class MpOrderDetailDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

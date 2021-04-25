@@ -1,5 +1,5 @@
-drop table if exists mp_product_detail;
-CREATE TABLE mp_product_detail
+drop table if exists mp_order_detail;
+CREATE TABLE mp_order_detail
 (
     id               bigint(11)     unsigned NOT NULL AUTO_INCREMENT COMMENT '订单详情id',
     product_order_id bigint(11)     DEFAULT NULL COMMENT '订单号',

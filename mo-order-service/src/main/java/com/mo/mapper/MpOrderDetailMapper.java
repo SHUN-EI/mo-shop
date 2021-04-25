@@ -1,6 +1,6 @@
 package com.mo.mapper;
 
-import com.mo.model.MpProductDetailDO;
+import com.mo.model.MpOrderDetailDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author mo
  * @since 2021-04-26
  */
-public interface MpProductDetailMapper extends BaseMapper<MpProductDetailDO> {
+public interface MpOrderDetailMapper extends BaseMapper<MpOrderDetailDO> {
 
 }

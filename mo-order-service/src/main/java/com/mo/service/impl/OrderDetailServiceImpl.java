@@ -1,6 +1,6 @@
 package com.mo.service.impl;
 
-import com.mo.service.ProductDetailService;
+import com.mo.service.OrderDetailService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
  * @since 2021-04-26
  */
 @Service
-public class ProductDetailServiceImpl implements ProductDetailService {
+public class OrderDetailServiceImpl implements OrderDetailService {
 
 }
