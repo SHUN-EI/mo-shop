@@ -1,17 +1,15 @@
 package com.mo.controller;
 
 
+import com.mo.enums.BizCodeEnum;
 import com.mo.service.MpProductService;
 import com.mo.utils.JsonData;
+import com.mo.vo.ProductVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -26,6 +24,15 @@ public class MpProductController {
 
     @Autowired
     private MpProductService productService;
+
+
+    @ApiOperation("商品详情")
+    @GetMapping("/detail/{product_id}")
+    public JsonData detail(@ApiParam(value = "商品id", required = true) @PathVariable("product_id") Long productId) {
+
+        ProductVO productVO = productService.findById(productId);
+        return productVO != null ? JsonData.buildSuccess(productVO) : JsonData.buildResult(BizCodeEnum.PRODUCT_NOT_EXISTS);
+    }
 
     @ApiOperation("分页查询商品列表")
     @GetMapping("/page_product")

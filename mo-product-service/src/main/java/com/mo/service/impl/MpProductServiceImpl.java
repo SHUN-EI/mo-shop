@@ -27,6 +27,18 @@ public class MpProductServiceImpl implements MpProductService {
     @Autowired
     private MpProductMapper productMapper;
 
+
+    @Override
+    public ProductVO findById(Long productId) {
+
+        MpProductDO productDO = productMapper.selectOne(new QueryWrapper<MpProductDO>().eq("id", productId));
+
+        ProductVO productVO = new ProductVO();
+        BeanUtils.copyProperties(productDO, productVO);
+
+        return productVO;
+    }
+
     @Override
     public Map<String, Object> pageProductList(int page, int size) {
 

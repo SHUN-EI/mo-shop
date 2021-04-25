@@ -2,6 +2,7 @@ package com.mo.service;
 
 import com.mo.model.MpProductDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mo.vo.ProductVO;
 
 import java.util.Map;
 
@@ -12,4 +13,6 @@ import java.util.Map;
 public interface MpProductService {
 
     Map<String, Object> pageProductList(int page, int size);
+
+    ProductVO findById(Long productId);
 }

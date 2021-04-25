@@ -33,6 +33,11 @@ public enum BizCodeEnum {
     ACCOUNT_UNLOGIN(250004, "账号未登录"),
 
     /**
+     * 商品
+     */
+    PRODUCT_NOT_EXISTS(260001,"商品不存在"),
+
+    /**
      * 优惠券
      */
     COUPON_CONDITION_ERROR(270001,"优惠券条件错误"),
