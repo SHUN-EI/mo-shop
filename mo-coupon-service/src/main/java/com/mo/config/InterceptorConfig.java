@@ -20,6 +20,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/coupon/*/**", "/api/coupon_record/*/**")
                 //不拦截路径
                 .excludePathPatterns(
-                        "/api/coupon/*/page_coupon");
+                        "/api/coupon/*/page_coupon",
+                        "/api/coupon/*/new_user_coupon");
     }
 }

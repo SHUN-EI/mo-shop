@@ -14,6 +14,7 @@ import com.mo.model.LoginUserDTO;
 import com.mo.model.MpCouponDO;
 import com.mo.mapper.MpCouponMapper;
 import com.mo.model.MpCouponRecordDO;
+import com.mo.request.NewUserCouponRequest;
 import com.mo.service.CouponService;
 import com.mo.utils.CommonUtil;
 import com.mo.utils.JsonData;
@@ -53,15 +54,43 @@ public class CouponServiceImpl implements CouponService {
     private RedissonClient redissonClient;
 
     /**
+     * 新用户注册领券优惠券
+     * 用户微服务-新用户注册接口调用这个方法的时候，没有登录，所以没有token
+     * 本地直接调用发放优惠券的方案，需要构造一个登录用户存储在threadlocal
+     *
+     * @param request
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public JsonData initNewUserCoupon(NewUserCouponRequest request) {
+
+        //构造一个登录用户存储在threadlocal
+        LoginUserDTO loginUserDTO = new LoginUserDTO();
+        loginUserDTO.setId(request.getUserId());
+        loginUserDTO.setUserName(request.getUserName());
+        LoginInterceptor.threadLocal.set(loginUserDTO);
+
+        //查询新用户可领券的优惠券列表
+        List<MpCouponDO> couponDOList = couponMapper.selectList(new QueryWrapper<MpCouponDO>()
+                .eq("category", CouponCategoryEnum.NEW_USER.name()));
+
+        //幂等操作，调用需要加锁，所以使用领券方法 addPromotionCoupon
+        couponDOList.forEach(obj -> addCoupon(obj.getId(), CouponCategoryEnum.NEW_USER));
+
+        return JsonData.buildSuccess();
+    }
+
+    /**
      * 领券
      *
      * @param couponId
      * @param couponCategoryEnum
      * @return
      */
-    @Transactional(rollbackFor=Exception.class,propagation= Propagation.REQUIRED)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
-    public JsonData addPromotionCoupon(Long couponId, CouponCategoryEnum couponCategoryEnum) {
+    public JsonData addCoupon(Long couponId, CouponCategoryEnum couponCategoryEnum) {
 
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
 
