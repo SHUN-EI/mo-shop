@@ -3,10 +3,12 @@ package com.mo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.SendCodeEnum;
+import com.mo.feign.CouponFeignService;
 import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.MpUserMapper;
 import com.mo.model.MpUserDO;
 import com.mo.model.LoginUserDTO;
+import com.mo.request.NewUserCouponRequest;
 import com.mo.request.UserLoginRequest;
 import com.mo.request.UserRegisterRequest;
 import com.mo.service.NotifyService;
@@ -38,6 +40,8 @@ public class UserServiceImpl implements UserService {
     private NotifyService notifyService;
     @Autowired
     private MpUserMapper userMapper;
+    @Autowired
+    private CouponFeignService couponFeignService;
 
     @Override
     public UserVO findUserDetail() {
@@ -86,7 +90,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public JsonData register(UserRegisterRequest request) {
 
@@ -120,7 +124,7 @@ public class UserServiceImpl implements UserService {
             int rows = userMapper.insert(userDO);
             log.info("rows:{},注册成功:{}", rows, userDO.toString());
 
-            //TODO 新用户注册成功，初始化信息，福利发放
+            //新用户注册成功，初始化信息，发放优惠券
             userRegisterInitTask(userDO);
 
             return JsonData.buildSuccess(userDO);
@@ -151,5 +155,10 @@ public class UserServiceImpl implements UserService {
      */
     private void userRegisterInitTask(MpUserDO userDO) {
 
+        NewUserCouponRequest request = new NewUserCouponRequest();
+        request.setUserId(userDO.getId());
+        request.setUserName(userDO.getUserName());
+        JsonData jsonData = couponFeignService.addNewUserCoupon(request);
+        log.info("新用户注册发放优惠券:{}, 结果为:{}", request.toString(), jsonData.toString());
     }
 }
