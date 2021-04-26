@@ -2,6 +2,8 @@ package com.mo.service;
 
 import com.mo.model.MpOrderDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mo.request.CreateOrderRequest;
+import com.mo.utils.JsonData;
 
 /**
  * @author mo
@@ -9,4 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface OrderService {
 
+    JsonData createOrder(CreateOrderRequest request);
 }
