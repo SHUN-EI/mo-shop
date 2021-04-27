@@ -17,7 +17,6 @@ import com.mo.utils.CommonUtil;
 import com.mo.utils.JWTUtil;
 import com.mo.utils.JsonData;
 import com.mo.vo.UserVO;
-import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -108,8 +107,8 @@ public class UserServiceImpl implements UserService {
      * @param request
      * @return
      */
-    //@Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    @GlobalTransactional
+    //@GlobalTransactional
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public JsonData register(UserRegisterRequest request) {
 
@@ -182,10 +181,10 @@ public class UserServiceImpl implements UserService {
         request.setUserId(userDO.getId());
         request.setUserName(userDO.getUserName());
         JsonData jsonData = couponFeignService.addNewUserCoupon(request);
-        //抛出这个异常是为了让seata感知到优惠券微服务出现了异常，通知TC让调用双方的数据库进行正常的数据回滚，使分布式事务生效
-        if (jsonData.getCode()!=0){
-            throw  new RuntimeException("发放优惠券异常");
-        }
+//        //抛出这个异常是为了让seata感知到优惠券微服务出现了异常，通知TC让调用双方的数据库进行正常的数据回滚，使分布式事务生效
+//        if (jsonData.getCode()!=0){
+//            throw  new RuntimeException("发放优惠券异常");
+//        }
 
         log.info("新用户注册发放优惠券:{}, 结果为:{}", request.toString(), jsonData.toString());
     }

@@ -48,10 +48,10 @@ aliyun:
     access-key-secret: DNI7wU7HqeF9UUReByft5i8F7eJ6HX
     bucketname: moshop-user-service
 #seata配置
-seata:
-  tx-service-group: ${spring.application.name}-group
-  service:
-    grouplist:
-      moshop: 39.108.182.26:8091
-    vgroup-mapping:
-      mo-user-service-group: moshop
+#seata:
+#  tx-service-group: ${spring.application.name}-group
+#  service:
+#    grouplist:
+#      moshop: 39.108.182.26:8091
+#    vgroup-mapping:
+#      mo-user-service-group: moshop
