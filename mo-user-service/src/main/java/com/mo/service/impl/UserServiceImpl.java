@@ -182,6 +182,11 @@ public class UserServiceImpl implements UserService {
         request.setUserId(userDO.getId());
         request.setUserName(userDO.getUserName());
         JsonData jsonData = couponFeignService.addNewUserCoupon(request);
+        //抛出这个异常是为了让seata感知到优惠券微服务出现了异常，通知TC让调用双方的数据库进行正常的数据回滚，使分布式事务生效
+        if (jsonData.getCode()!=0){
+            throw  new RuntimeException("发放优惠券异常");
+        }
+
         log.info("新用户注册发放优惠券:{}, 结果为:{}", request.toString(), jsonData.toString());
     }
 }
