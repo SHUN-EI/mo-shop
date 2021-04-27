@@ -17,6 +17,7 @@ import com.mo.utils.CommonUtil;
 import com.mo.utils.JWTUtil;
 import com.mo.utils.JsonData;
 import com.mo.vo.UserVO;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CouponFeignService couponFeignService;
 
+    /**
+     * 用户信息查询
+     *
+     * @return
+     */
     @Override
     public UserVO findUserDetail() {
 
@@ -58,6 +64,12 @@ public class UserServiceImpl implements UserService {
         return userVO;
     }
 
+    /**
+     * 用户登录
+     *
+     * @param request
+     * @return
+     */
     @Override
     public JsonData login(UserLoginRequest request) {
 
@@ -90,7 +102,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    /**
+     * 用户注册
+     *
+     * @param request
+     * @return
+     */
+    //@Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @GlobalTransactional
     @Override
     public JsonData register(UserRegisterRequest request) {
 
@@ -126,6 +145,10 @@ public class UserServiceImpl implements UserService {
 
             //新用户注册成功，初始化信息，发放优惠券
             userRegisterInitTask(userDO);
+
+            //模拟分布式场景下，用户注册接口调用发放优惠券接口出现异常
+            //需要先注释掉 ExceptionHandle 我们处理全局异常的逻辑
+            //int b = 1 / 0;
 
             return JsonData.buildSuccess(userDO);
         } else {
