@@ -16,6 +16,15 @@ spring:
     host: 39.108.182.26
     port: 8000
     password: 123456
+  rabbitmq:   #消息队列
+    host: 39.108.182.26
+    port: 5672
+    virtual-host: /
+    username: admin
+    password: mo12345
+    listener:  #开启手动确认消息
+      simple:
+        acknowledge-mode: manual
   flyway:
     enabled: true
     encoding: utf-8
