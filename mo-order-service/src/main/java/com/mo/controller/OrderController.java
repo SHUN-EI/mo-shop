@@ -1,7 +1,9 @@
 package com.mo.controller;
 
 
+import com.mo.enums.BizCodeEnum;
 import com.mo.enums.OrderPayTypeEnum;
+import com.mo.model.MpOrderDO;
 import com.mo.request.CreateOrderRequest;
 import com.mo.service.OrderService;
 import com.mo.utils.JsonData;
@@ -9,12 +11,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,6 +31,23 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    /**
+     * 查询订单状态
+     * 此接口没有登录拦截，远程调用考虑安全的话，可以增加一个密钥进行RPC通信
+     * 不加密钥也行，因为此接口只是返回一个订单的状态，没有太多敏感信息
+     *
+     * @param outTradeNo
+     * @return
+     */
+    @ApiOperation("查询订单状态")
+    @GetMapping("/query_order_state")
+    public JsonData queryOrderState(@ApiParam("订单号") @RequestParam("out_trade_no") String outTradeNo) {
+
+        JsonData jsonData = orderService.queryOrderState(outTradeNo);
+        return jsonData == null ? JsonData.buildResult(BizCodeEnum.ORDER_CONFIRM_NOT_EXIST)
+                : JsonData.buildSuccess(((MpOrderDO) jsonData.getData()).getState());
+    }
 
     @ApiOperation("创建订单")
     @PostMapping("/createOrder")

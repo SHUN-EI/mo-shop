@@ -1,8 +1,12 @@
 package com.mo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.mo.mapper.MpOrderMapper;
+import com.mo.model.MpOrderDO;
 import com.mo.request.CreateOrderRequest;
 import com.mo.service.OrderService;
 import com.mo.utils.JsonData;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,6 +15,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    private MpOrderMapper orderMapper;
 
     @Override
     public JsonData createOrder(CreateOrderRequest request) {
@@ -38,5 +45,23 @@ public class OrderServiceImpl implements OrderService {
         //创建支付信息-对接第三方支付
 
         return null;
+    }
+
+    /**
+     * 查询订单状态
+     *
+     * @param outTradeNo
+     * @return
+     */
+    @Override
+    public JsonData queryOrderState(String outTradeNo) {
+
+        MpOrderDO orderDO = orderMapper.selectOne(new QueryWrapper<MpOrderDO>().eq("out_trade_no", outTradeNo));
+
+        if (null == orderDO) {
+            return null;
+        } else {
+            return JsonData.buildSuccess(orderDO);
+        }
     }
 }

@@ -12,4 +12,6 @@ import com.mo.utils.JsonData;
 public interface OrderService {
 
     JsonData createOrder(CreateOrderRequest request);
+
+    JsonData queryOrderState(String outTradeNo);
 }
