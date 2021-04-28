@@ -19,14 +19,12 @@ public class MyBatisPlusGenerator {
     public static void main(String[] args) {
         //1. 全局配置
         GlobalConfig config = new GlobalConfig();
-        // 是否支持AR模式
-        config.setActiveRecord(false)
-                // 作者
-                .setAuthor("mo")
+        // 作者
+        config.setAuthor("mo")
                 // 生成路径，最好使用绝对路径，window路径是不一样的
                 //TODO  TODO  TODO  TODO
-//                .setOutputDir("/Users/xdclass/Desktop/demo/src/main/java") //这是绝对路径,可以存放在一个另外的目录下，然后再复制进项目
-                .setOutputDir("mo-product-service/src/main/java")//相对路径
+                .setOutputDir("/Users/mo/develop/mbp-test") //这是绝对路径,可以存放在一个另外的目录下，然后再复制进项目
+                //.setOutputDir("mo-product-service/src/main/java")//相对路径
                 // 文件覆盖
                 .setFileOverride(true)
                 // 主键策略
@@ -74,7 +72,8 @@ public class MyBatisPlusGenerator {
 
                 // 生成的表, 支持多表一起生成，以数组形式填写
                 //TODO  TODO  TODO  TODO
-                .setInclude("banner", "mp_product");
+                //.setInclude("banner", "mp_product");
+                .setInclude("product_task");
 
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
