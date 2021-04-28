@@ -3,19 +3,30 @@ package com.mo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mo.enums.BizCodeEnum;
+import com.mo.enums.CouponStateEnum;
+import com.mo.enums.LockStateEnum;
+import com.mo.exception.BizException;
 import com.mo.interceptor.LoginInterceptor;
+import com.mo.mapper.CouponTaskMapper;
+import com.mo.model.CouponTaskDO;
 import com.mo.model.LoginUserDTO;
 import com.mo.model.MpCouponRecordDO;
 import com.mo.mapper.MpCouponRecordMapper;
+import com.mo.request.LockCouponRecordRequest;
 import com.mo.service.CouponRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mo.utils.JsonData;
 import com.mo.vo.CouponRecordVO;
 import com.mo.vo.CouponVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +42,53 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
     @Autowired
     private MpCouponRecordMapper couponRecordMapper;
+    @Autowired
+    private CouponTaskMapper couponTaskMapper;
+
+
+    /**
+     * 锁定优惠券
+     *
+     * @param request
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public JsonData lockCouponRecords(LockCouponRecordRequest request) {
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        String orderOutTradeNo = request.getOrderOutTradeNo();
+        List<Long> lockCouponRecordIds = request.getLockCouponRecordIds();
+
+        //修改优惠券记录的使用状态为USED，表示优惠券已被使用,优惠券记录锁定
+        int updateRows = couponRecordMapper.lockUseStateBatch(loginUserDTO.getId(), CouponStateEnum.USED.name(),
+                CouponStateEnum.NEW.name(), lockCouponRecordIds);
+
+        List<CouponTaskDO> couponTaskDOList = lockCouponRecordIds.stream().map(obj -> {
+            CouponTaskDO couponTaskDO = new CouponTaskDO();
+            couponTaskDO.setOutTradeNo(orderOutTradeNo);
+            couponTaskDO.setCouponRecordId(obj);
+            couponTaskDO.setCreateTime(new Date());
+            couponTaskDO.setUpdateTime(new Date());
+            couponTaskDO.setLockState(LockStateEnum.LOCK.name());
+
+            return couponTaskDO;
+        }).collect(Collectors.toList());
+
+        //优惠券库存锁定任务表中 插入记录
+        int insertRows = couponTaskMapper.insertBatch(couponTaskDOList);
+
+        log.info("优惠券记录锁定 updateRows={}", updateRows);
+        log.info("新增优惠券记录task insertRows={}", insertRows);
+
+        if (lockCouponRecordIds.size() == insertRows && insertRows == updateRows) {
+            //TODO 发送延迟消息
+
+            return JsonData.buildSuccess();
+        } else {
+            throw new BizException(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
+        }
+    }
 
     /**
      * 查询优惠券记录信息

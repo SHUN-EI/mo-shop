@@ -4,17 +4,35 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.mo.model.CouponTaskDO">
-        <id column="id" property="id" />
-        <result column="coupon_id" property="couponId" />
-        <result column="out_trade_no" property="outTradeNo" />
-        <result column="lock_state" property="lockState" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="coupon_record_id" property="couponRecordId"/>
+        <result column="out_trade_no" property="outTradeNo"/>
+        <result column="lock_state" property="lockState"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, coupon_id, out_trade_no, lock_state, create_time, update_time
+        id, coupon_record_id, out_trade_no, lock_state, create_time, update_time
     </sql>
 
+    <sql id="Base_Column_List_No_Id">
+         coupon_record_id, out_trade_no, lock_state, create_time, update_time
+    </sql>
+
+    <!--批量插入-->
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into coupon_task (<include refid="Base_Column_List_No_Id"/>)
+        values
+        <foreach collection="couponTaskList" item="item" index="index" separator=",">
+            (
+            #{item.couponRecordId}
+            #{item.outTradeNo}
+            #{item.lockState}
+            #{item.createTime}
+            #{item.updateTime}
+            )
+        </foreach>
+    </insert>
 </mapper>

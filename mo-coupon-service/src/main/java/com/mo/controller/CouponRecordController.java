@@ -2,6 +2,7 @@ package com.mo.controller;
 
 
 import com.mo.enums.BizCodeEnum;
+import com.mo.request.LockCouponRecordRequest;
 import com.mo.service.CouponRecordService;
 import com.mo.utils.JsonData;
 import com.mo.vo.CouponRecordVO;
@@ -24,6 +25,15 @@ public class CouponRecordController {
 
     @Autowired
     private CouponRecordService couponRecordService;
+
+    @ApiOperation("RPC-锁定优惠券记录")
+    @PostMapping("lock_coupon_records")
+    public JsonData lockCouponRecords(@ApiParam("优惠券锁定请求对象") @RequestBody LockCouponRecordRequest request) {
+
+        JsonData jsonData = couponRecordService.lockCouponRecords(request);
+        return JsonData.buildSuccess(jsonData);
+    }
+
 
     @ApiOperation("查询优惠券领券记录详情")
     @GetMapping("/detail/{record_id}")
