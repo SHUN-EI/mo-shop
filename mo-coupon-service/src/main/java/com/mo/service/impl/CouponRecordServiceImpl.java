@@ -3,12 +3,14 @@ package com.mo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mo.config.RabbitMQConfig;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.CouponStateEnum;
 import com.mo.enums.LockStateEnum;
 import com.mo.exception.BizException;
 import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.CouponTaskMapper;
+import com.mo.model.CouponRecordMessage;
 import com.mo.model.CouponTaskDO;
 import com.mo.model.LoginUserDTO;
 import com.mo.model.MpCouponRecordDO;
@@ -20,6 +22,7 @@ import com.mo.utils.JsonData;
 import com.mo.vo.CouponRecordVO;
 import com.mo.vo.CouponVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,10 @@ public class CouponRecordServiceImpl implements CouponRecordService {
     private MpCouponRecordMapper couponRecordMapper;
     @Autowired
     private CouponTaskMapper couponTaskMapper;
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     /**
@@ -82,7 +89,17 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         log.info("新增优惠券记录task insertRows={}", insertRows);
 
         if (lockCouponRecordIds.size() == insertRows && insertRows == updateRows) {
-            //TODO 发送延迟消息
+            //发送延迟消息
+            couponTaskDOList.forEach(obj -> {
+                CouponRecordMessage message = new CouponRecordMessage();
+                message.setOutTradeNo(orderOutTradeNo);
+                message.setCouponTaskId(obj.getId());
+                rabbitTemplate.convertAndSend(rabbitMQConfig.getCouponEventExchange(),
+                        rabbitMQConfig.getCouponReleaseDelayRoutingKey(),
+                        message);
+
+                log.info("优惠券锁定消息发送成功:{}", message.toString());
+            });
 
             return JsonData.buildSuccess();
         } else {

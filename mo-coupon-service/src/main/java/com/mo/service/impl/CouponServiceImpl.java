@@ -113,7 +113,6 @@ public class CouponServiceImpl implements CouponService {
         //校验优惠券是否可以领取：时间、库存、超过限制张数
         couponCheck(couponDO, loginUserDTO.getId());
 
-
         //保存领券记录
         MpCouponRecordDO couponRecordDO = new MpCouponRecordDO();
         BeanUtils.copyProperties(couponDO, couponRecordDO);
