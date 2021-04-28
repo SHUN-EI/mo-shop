@@ -7,7 +7,9 @@ import com.mo.config.RabbitMQConfig;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.CouponStateEnum;
 import com.mo.enums.LockStateEnum;
+import com.mo.enums.OrderStateEnum;
 import com.mo.exception.BizException;
+import com.mo.feign.OrderFeignService;
 import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.CouponTaskMapper;
 import com.mo.model.CouponRecordMessage;
@@ -51,7 +53,66 @@ public class CouponRecordServiceImpl implements CouponRecordService {
     private RabbitMQConfig rabbitMQConfig;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private OrderFeignService orderFeignService;
 
+
+    /**
+     * 解锁优惠券记录
+     *
+     * @param recordMessage
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public boolean releaseCouponRecord(CouponRecordMessage recordMessage) {
+        //查询coupon_task 优惠券库存锁定任务是否存在
+        CouponTaskDO couponTaskDO = couponTaskMapper.selectOne(new QueryWrapper<CouponTaskDO>().eq("id", recordMessage.getCouponTaskId()));
+
+        if (null == couponTaskDO) {
+            log.warn("优惠券库存锁定任务不存在，消息体={}", recordMessage);
+            return true;//消息已经被消费了
+        }
+
+        //lock状态才处理
+        if (couponTaskDO.getLockState().equalsIgnoreCase(LockStateEnum.LOCK.name())) {
+
+            //查询订单状态,远程调用order微服务查询订单状态接口
+            JsonData jsonData = orderFeignService.queryOrderState(recordMessage.getOutTradeNo());
+            //判断查询订单状态接口是否正常响应
+            if (jsonData.getCode() == 0) {
+                //判断订单状态
+                String state = jsonData.getData().toString();
+
+                //若订单状态为 NEW-新建未支付订单，则消息需要返回队列，重新投递
+                //正常不会查到状态为NEW的订单，因为优惠券库存锁定的消息队列设置的延迟时间是比订单消息队列要长的
+                //则订单服务那边应该会先查支付状态，根据支付状态修改订单状态为PAY或CANCEL
+                if (OrderStateEnum.NEW.name().equalsIgnoreCase(state)) {
+                    log.warn("订单状态为NEW,消息需要返回队列，重新投递:{}", recordMessage);
+                    return false;//消息需要返回队列，重新投递
+                }
+
+                //若订单状态为PAY-已经支付订单,需要修改优惠券库存锁定任务的记录Task的状态为FINISH
+                if (OrderStateEnum.PAY.name().equalsIgnoreCase(state)) {
+                    couponTaskDO.setLockState(LockStateEnum.FINISH.name());
+                    couponTaskMapper.update(couponTaskDO, new QueryWrapper<CouponTaskDO>().eq("id", recordMessage.getCouponTaskId()));
+                    log.info("订单已经支付，修改优惠券库存锁定记录状态为FINISH:{}", recordMessage);
+                    return true;
+                }
+            }
+
+            //若订单不存在或订单状态为CANCEL-超时取消订单，确认并消费消息，修改coupon_task状态为CANCEL,恢复优惠券使用记录为NEW
+            log.warn("订单不存在，或订单超时被取消，确认并消费消息，修改coupon_task状态为CANCEL,恢复优惠券使用记录为NEW,message:{}", recordMessage);
+            //恢复优惠券记录的使用状态为NEW
+            couponRecordMapper.updateState(couponTaskDO.getCouponRecordId(), CouponStateEnum.NEW.name());
+
+            return true;//消息已经被消费了
+        } else {
+            log.warn("优惠券库存锁定状态不是lock，state={},消息体={}", couponTaskDO.getLockState(), recordMessage);
+            return true;//消息已经被消费了
+        }
+
+    }
 
     /**
      * 锁定优惠券

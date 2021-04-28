@@ -33,4 +33,9 @@
         </foreach>
     </update>
 
+    <!--更新优惠券使用记录-->
+    <update id="updateState">
+        update  mp_coupon_record set  use_state=#{useState} where id=#{couponRecordId}
+    </update>
+
 </mapper>

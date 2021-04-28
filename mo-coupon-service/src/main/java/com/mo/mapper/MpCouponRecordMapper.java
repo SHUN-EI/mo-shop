@@ -24,5 +24,13 @@ public interface MpCouponRecordMapper extends BaseMapper<MpCouponRecordDO> {
      * @param lockCouponRecordIds
      * @return
      */
-    int lockUseStateBatch(@Param("userId") Long userId, @Param("useState") String useState, @Param("oldUseState") String oldUseState,@Param("lockCouponRecordIds") List<Long> lockCouponRecordIds);
+    int lockUseStateBatch(@Param("userId") Long userId, @Param("useState") String useState, @Param("oldUseState") String oldUseState, @Param("lockCouponRecordIds") List<Long> lockCouponRecordIds);
+
+    /**
+     * 更新优惠券使用记录
+     *
+     * @param couponRecordId
+     * @param useState
+     */
+    void updateState(@Param("couponRecordId") Long couponRecordId, @Param("useState") String useState);
 }

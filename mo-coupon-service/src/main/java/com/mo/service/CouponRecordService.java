@@ -1,5 +1,6 @@
 package com.mo.service;
 
+import com.mo.model.CouponRecordMessage;
 import com.mo.model.MpCouponRecordDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mo.request.LockCouponRecordRequest;
@@ -19,4 +20,6 @@ public interface CouponRecordService {
     CouponRecordVO findById(Long recordId);
 
     JsonData lockCouponRecords(LockCouponRecordRequest request);
+
+    boolean releaseCouponRecord(CouponRecordMessage recordMessage);
 }
