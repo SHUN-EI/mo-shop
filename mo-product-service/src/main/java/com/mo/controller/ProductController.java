@@ -3,7 +3,7 @@ package com.mo.controller;
 
 import com.mo.enums.BizCodeEnum;
 import com.mo.request.LockProductRequest;
-import com.mo.service.MpProductService;
+import com.mo.service.ProductService;
 import com.mo.utils.JsonData;
 import com.mo.vo.ProductVO;
 import io.swagger.annotations.Api;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class ProductController {
 
     @Autowired
-    private MpProductService productService;
+    private ProductService productService;
 
     @ApiOperation("RPC-锁定商品库存")
     @PostMapping("/lock_products")

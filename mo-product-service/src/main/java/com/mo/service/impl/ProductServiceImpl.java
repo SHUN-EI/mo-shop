@@ -3,19 +3,22 @@ package com.mo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mo.config.RabbitMQConfig;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.LockStateEnum;
 import com.mo.exception.BizException;
 import com.mo.mapper.ProductTaskMapper;
 import com.mo.model.MpProductDO;
 import com.mo.mapper.MpProductMapper;
+import com.mo.model.ProductMessage;
 import com.mo.model.ProductTaskDO;
 import com.mo.request.LockProductRequest;
 import com.mo.request.OrderItemRequest;
-import com.mo.service.MpProductService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mo.service.ProductService;
 import com.mo.utils.JsonData;
 import com.mo.vo.ProductVO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,12 +37,17 @@ import java.util.stream.Collectors;
  * @since 2021-04-25
  */
 @Service
-public class MpProductServiceImpl implements MpProductService {
+@Slf4j
+public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private MpProductMapper productMapper;
     @Autowired
     private ProductTaskMapper productTaskMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
 
     /**
@@ -84,7 +92,16 @@ public class MpProductServiceImpl implements MpProductService {
 
                 productTaskMapper.insert(productTaskDO);
 
-                //TODO 每一次锁定商品，都要发送延迟消息,解锁商品库存
+                //每一次锁定商品，都要发送延迟消息,解锁商品库存
+                ProductMessage message = new ProductMessage();
+                message.setOutTradeNo(orderOutTradeNo);
+                //mybaitsPlus插入数据后，自动返回数据库自增id,但mybatis不会默认返回id,需配置
+                message.setProductTaskId(productTaskDO.getId());
+
+                rabbitTemplate.convertAndSend(rabbitMQConfig.getProductEventExchange(),
+                        rabbitMQConfig.getProductReleaseDelayRoutingKey(), message);
+
+                log.info("商品库存锁定信息发送成功:{}", message);
             }
         });
 

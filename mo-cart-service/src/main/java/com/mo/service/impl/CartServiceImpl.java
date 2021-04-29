@@ -8,7 +8,7 @@ import com.mo.interceptor.LoginInterceptor;
 import com.mo.model.LoginUserDTO;
 import com.mo.request.CartItemRequest;
 import com.mo.service.CartService;
-import com.mo.service.MpProductService;
+import com.mo.service.ProductService;
 import com.mo.vo.CartItemVO;
 import com.mo.vo.CartVO;
 import com.mo.vo.ProductVO;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class CartServiceImpl implements CartService {
 
     @Autowired
-    private MpProductService productService;
+    private ProductService productService;
     @Autowired
     private RedisTemplate redisTemplate;
 

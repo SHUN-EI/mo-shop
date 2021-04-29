@@ -13,7 +13,7 @@ import java.util.Map;
  * @author mo
  * @since 2021-04-25
  */
-public interface MpProductService {
+public interface ProductService {
 
     Map<String, Object> pageProductList(int page, int size);
 

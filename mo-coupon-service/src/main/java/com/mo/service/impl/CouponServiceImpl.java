@@ -139,6 +139,12 @@ public class CouponServiceImpl implements CouponService {
         return JsonData.buildSuccess();
     }
 
+    /**
+     * 分页查询优惠券列表
+     * @param page
+     * @param size
+     * @return
+     */
     @Override
     public Map<String, Object> pageCouponActivity(int page, int size) {
         //第1页，每页10条
@@ -201,7 +207,7 @@ public class CouponServiceImpl implements CouponService {
             throw new BizException(BizCodeEnum.COUPON_OUT_OF_TIME);
         }
 
-        //
+        //判断优惠券领券记录是否超过限制
         int recordNum = couponRecordMapper.selectCount(new QueryWrapper<MpCouponRecordDO>()
                 .eq("coupon_id", couponDO.getId())
                 .eq("user_id", userId));
