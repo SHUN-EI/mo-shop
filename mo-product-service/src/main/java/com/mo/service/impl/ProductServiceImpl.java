@@ -99,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
 
             //若订单不存在或订单状态为CANCEL-超时取消订单，确认并消费消息，修改product_task状态为CANCEL,恢复商品的lock_stock
             log.warn("订单不存在，或订单超时被取消，确认并消费消息，修改product_task状态为CANCEL,恢复商品的lock_stock,message:{}", productMessage);
-            //恢复商品的锁定库存
+            //恢复商品的锁定库存, 商品的锁定库存=锁定库存值-购买数量值
             productMapper.unlockProductStock(productTaskDO.getProductId(), productTaskDO.getBuyNum());
 
             //修改商品库存锁定任务的锁定状态为 CANCEL

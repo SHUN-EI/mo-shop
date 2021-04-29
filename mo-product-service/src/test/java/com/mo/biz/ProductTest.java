@@ -1,6 +1,8 @@
 package com.mo.biz;
 
 import com.mo.ProductApplication;
+import com.mo.model.CouponRecordMessage;
+import com.mo.model.ProductMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,4 +26,13 @@ public class ProductTest {
     public void sendMessage() {
         rabbitTemplate.convertAndSend("product.event.exchange", "product.release.delay.routing.key", "this is product stock  lock");
     }
+
+    @Test
+    public void productStockReleaseTest() {
+        ProductMessage message = new ProductMessage();
+        message.setOutTradeNo("XD210429000000018073");
+        message.setProductTaskId(1L);
+        rabbitTemplate.convertAndSend("product.event.exchange", "product.release.delay.routing.key",message);
+    }
+
 }
