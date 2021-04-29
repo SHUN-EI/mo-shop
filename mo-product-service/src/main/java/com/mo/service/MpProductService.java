@@ -2,6 +2,8 @@ package com.mo.service;
 
 import com.mo.model.MpProductDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mo.request.LockProductRequest;
+import com.mo.utils.JsonData;
 import com.mo.vo.ProductVO;
 
 import java.util.List;
@@ -18,4 +20,6 @@ public interface MpProductService {
     ProductVO findById(Long productId);
 
     List<ProductVO> findProductByIdBatch(List<Long> productIds);
+
+    JsonData lockProducts(LockProductRequest request);
 }

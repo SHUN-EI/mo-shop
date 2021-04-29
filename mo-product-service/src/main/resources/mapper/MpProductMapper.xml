@@ -4,21 +4,26 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.mo.model.MpProductDO">
-        <id column="id" property="id" />
-        <result column="title" property="title" />
-        <result column="cover_img" property="coverImg" />
-        <result column="detail" property="detail" />
-        <result column="old_amount" property="oldAmount" />
-        <result column="amount" property="amount" />
-        <result column="stock" property="stock" />
-        <result column="lock_stock" property="lockStock" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="cover_img" property="coverImg"/>
+        <result column="detail" property="detail"/>
+        <result column="old_amount" property="oldAmount"/>
+        <result column="amount" property="amount"/>
+        <result column="stock" property="stock"/>
+        <result column="lock_stock" property="lockStock"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, title, cover_img, detail, old_amount, amount, stock, lock_stock, create_time, update_time
     </sql>
+
+    <update id="lockProductStock">
+        update mp_product set lock_stock=lock_stock+#{buyNum}
+        where id=#{productId} and stock-lock_stock >=#{buyNum}
+    </update>
 
 </mapper>

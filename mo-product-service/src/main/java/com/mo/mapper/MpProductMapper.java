@@ -2,6 +2,7 @@ package com.mo.mapper;
 
 import com.mo.model.MpProductDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MpProductMapper extends BaseMapper<MpProductDO> {
 
+    /**
+     * 锁定商品库存
+     *
+     * @param productId
+     * @param buyNum
+     * @return
+     */
+    int lockProductStock(@Param("productId") Long productId, @Param("buyNum") Integer buyNum);
 }

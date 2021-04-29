@@ -2,6 +2,7 @@ package com.mo.controller;
 
 
 import com.mo.enums.BizCodeEnum;
+import com.mo.request.LockProductRequest;
 import com.mo.service.MpProductService;
 import com.mo.utils.JsonData;
 import com.mo.vo.ProductVO;
@@ -20,11 +21,18 @@ import java.util.Map;
 @Api(tags = "商品模块")
 @RestController
 @RequestMapping("/api/product/v1")
-public class MpProductController {
+public class ProductController {
 
     @Autowired
     private MpProductService productService;
 
+    @ApiOperation("RPC-锁定商品库存")
+    @PostMapping("/lock_products")
+    public JsonData lockProducts(@ApiParam("商品锁定请求对象") @RequestBody LockProductRequest request) {
+
+        JsonData jsonData = productService.lockProducts(request);
+        return jsonData;
+    }
 
     @ApiOperation("商品详情")
     @GetMapping("/detail/{product_id}")
