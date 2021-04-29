@@ -11,7 +11,12 @@ public class CacheKey {
     public static final String CHECK_CODE_KEY = "code:%s:%s";
 
     /**
-     * 购物车 hahs 结构，%s是用户唯一标识 user_id
+     * 购物车-hahs 结构，%s是用户唯一标识 user_id
      */
     public static final String CART_KEY = "cart:%s";
+
+    /**
+     * 订单-流水号缓存key前缀
+     */
+    public static final String ORDER_CODE_CACHE_PREFIX_KEY = "ORDER_CODE_CACHE:";
 }
