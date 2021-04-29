@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.config.RabbitMQConfig;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.LockStateEnum;
+import com.mo.enums.OrderStateEnum;
 import com.mo.exception.BizException;
+import com.mo.feign.OrderFeignService;
 import com.mo.mapper.ProductTaskMapper;
 import com.mo.model.MpProductDO;
 import com.mo.mapper.MpProductMapper;
@@ -48,7 +50,69 @@ public class ProductServiceImpl implements ProductService {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
+    @Autowired
+    private OrderFeignService orderFeignService;
 
+
+    /**
+     * 释放商品库存
+     *
+     * @param productMessage
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public boolean releaseProductStock(ProductMessage productMessage) {
+        //查询product_task 商品库存锁定任务是否存在
+        ProductTaskDO productTaskDO = productTaskMapper.selectOne(new QueryWrapper<ProductTaskDO>().eq("id", productMessage.getProductTaskId()));
+
+        if (null == productTaskDO) {
+            log.warn("商品库存锁定任务不存在，消息体={}", productMessage);
+            return true;//消息消费
+        }
+
+        //lock状态才处理
+        if (productTaskDO.getLockState().equalsIgnoreCase(LockStateEnum.LOCK.name())) {
+            //查询订单状态,远程调用order微服务查询订单状态接口
+            JsonData jsonData = orderFeignService.queryOrderState(productMessage.getOutTradeNo());
+            //判断查询订单状态接口是否正常响应
+            if (jsonData.getCode() == 0) {
+                //判断订单状态
+                String state = jsonData.getData().toString();
+
+                //若订单状态为 NEW-新建未支付订单，则消息需要返回队列，重新投递
+                //正常不会查到状态为NEW的订单，因为商品库存锁定的消息队列设置的延迟时间是比订单消息队列要长的
+                //则订单服务那边应该会先查支付状态，根据支付状态修改订单状态为PAY或CANCEL
+                if (OrderStateEnum.NEW.name().equalsIgnoreCase(state)) {
+                    log.warn("订单状态为NEW,消息需要返回队列，重新投递:{}", productMessage);
+                    return false;//消息需要返回队列，重新投递
+                }
+
+                //若订单状态为PAY-已经支付订单,需要修改商品库存锁定任务的记录Task的状态为FINISH
+                if (OrderStateEnum.PAY.name().equalsIgnoreCase(state)) {
+                    productTaskDO.setLockState(LockStateEnum.FINISH.name());
+                    productTaskMapper.update(productTaskDO, new QueryWrapper<ProductTaskDO>().eq("id", productMessage.getProductTaskId()));
+                    log.info("订单已经支付，修改商品库存锁定记录状态为FINISH:{}", productMessage);
+                    return true;//消息消费
+                }
+            }
+
+            //若订单不存在或订单状态为CANCEL-超时取消订单，确认并消费消息，修改product_task状态为CANCEL,恢复商品的lock_stock
+            log.warn("订单不存在，或订单超时被取消，确认并消费消息，修改product_task状态为CANCEL,恢复商品的lock_stock,message:{}", productMessage);
+            //恢复商品的锁定库存
+            productMapper.unlockProductStock(productTaskDO.getProductId(), productTaskDO.getBuyNum());
+
+            //修改商品库存锁定任务的锁定状态为 CANCEL
+            productTaskDO.setLockState(LockStateEnum.CANCEL.name());
+            productTaskMapper.update(productTaskDO, new QueryWrapper<ProductTaskDO>().eq("id", productMessage.getProductTaskId()));
+
+            return true;//消息消费
+        } else {
+            log.warn("商品库存锁定状态不是lock,state={},消息体={}", productTaskDO.getLockState(), productMessage);
+            return true;//消息消费
+        }
+
+    }
 
     /**
      * 锁定商品库存

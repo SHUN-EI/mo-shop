@@ -71,7 +71,7 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
         if (null == couponTaskDO) {
             log.warn("优惠券库存锁定任务不存在，消息体={}", recordMessage);
-            return true;//消息已经被消费了
+            return true;//消息消费
         }
 
         //lock状态才处理
@@ -97,7 +97,7 @@ public class CouponRecordServiceImpl implements CouponRecordService {
                     couponTaskDO.setLockState(LockStateEnum.FINISH.name());
                     couponTaskMapper.update(couponTaskDO, new QueryWrapper<CouponTaskDO>().eq("id", recordMessage.getCouponTaskId()));
                     log.info("订单已经支付，修改优惠券库存锁定记录状态为FINISH:{}", recordMessage);
-                    return true;
+                    return true;//消息消费
                 }
             }
 
@@ -110,10 +110,10 @@ public class CouponRecordServiceImpl implements CouponRecordService {
             couponTaskDO.setLockState(LockStateEnum.CANCEL.name());
             couponTaskMapper.update(couponTaskDO, new QueryWrapper<CouponTaskDO>().eq("id", recordMessage.getCouponTaskId()));
 
-            return true;//消息已经被消费了
+            return true;//消息消费
         } else {
             log.warn("优惠券库存锁定状态不是lock，state={},消息体={}", couponTaskDO.getLockState(), recordMessage);
-            return true;//消息已经被消费了
+            return true;//消息消费
         }
 
     }

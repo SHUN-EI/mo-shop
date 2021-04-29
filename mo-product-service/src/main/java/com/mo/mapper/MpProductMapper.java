@@ -22,4 +22,12 @@ public interface MpProductMapper extends BaseMapper<MpProductDO> {
      * @return
      */
     int lockProductStock(@Param("productId") Long productId, @Param("buyNum") Integer buyNum);
+
+    /**
+     * 解锁商品库存
+     *
+     * @param productId
+     * @param buyNum
+     */
+    void unlockProductStock(@Param("productId") Long productId, @Param("buyNum") Integer buyNum);
 }

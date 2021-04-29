@@ -9,11 +9,11 @@
         <outputRelativeToContentRoot value="true" />
         <module name="mo-user-service" />
         <module name="mo-product-service" />
-        <module name="mo-coupon-service" />
         <module name="mo-gateway" />
         <module name="mo-cart-service" />
-        <module name="mo-order-service" />
         <module name="mo-common" />
+        <module name="mo-order-service" />
+        <module name="mo-coupon-service" />
       </profile>
     </annotationProcessing>
   </component>
