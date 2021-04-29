@@ -106,6 +106,10 @@ public class CouponRecordServiceImpl implements CouponRecordService {
             //恢复优惠券记录的使用状态为NEW
             couponRecordMapper.updateState(couponTaskDO.getCouponRecordId(), CouponStateEnum.NEW.name());
 
+            //修改优惠券库存锁定任务的锁定状态为 CANCEL
+            couponTaskDO.setLockState(LockStateEnum.CANCEL.name());
+            couponTaskMapper.update(couponTaskDO, new QueryWrapper<CouponTaskDO>().eq("id", recordMessage.getCouponTaskId()));
+
             return true;//消息已经被消费了
         } else {
             log.warn("优惠券库存锁定状态不是lock，state={},消息体={}", couponTaskDO.getLockState(), recordMessage);
