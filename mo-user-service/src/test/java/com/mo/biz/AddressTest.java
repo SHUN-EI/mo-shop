@@ -1,8 +1,7 @@
 package com.mo.biz;
 
 import com.mo.UserApplication;
-import com.mo.model.MpAddressDO;
-import com.mo.service.MpAddressService;
+import com.mo.service.AddressService;
 import com.mo.vo.AddressVO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -21,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class AddressTest {
 
     @Autowired
-    private MpAddressService addressService;
+    private AddressService addressService;
 
     @Test
     public void testAddressDetail() {

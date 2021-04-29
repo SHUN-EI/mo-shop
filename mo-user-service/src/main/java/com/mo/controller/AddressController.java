@@ -2,9 +2,8 @@ package com.mo.controller;
 
 
 import com.mo.enums.BizCodeEnum;
-import com.mo.model.MpAddressDO;
 import com.mo.request.AddressAddRequest;
-import com.mo.service.MpAddressService;
+import com.mo.service.AddressService;
 import com.mo.utils.JsonData;
 import com.mo.vo.AddressVO;
 import io.swagger.annotations.Api;
@@ -26,7 +25,7 @@ import java.util.List;
 public class AddressController {
 
     @Autowired
-    private MpAddressService addressService;
+    private AddressService addressService;
 
 
     @ApiOperation("查询用户的全部收货地址")

@@ -7,8 +7,7 @@ import com.mo.model.LoginUserDTO;
 import com.mo.model.MpAddressDO;
 import com.mo.mapper.MpAddressMapper;
 import com.mo.request.AddressAddRequest;
-import com.mo.service.MpAddressService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mo.service.AddressService;
 import com.mo.vo.AddressVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class AddressServiceImpl implements MpAddressService {
+public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private MpAddressMapper addressMapper;

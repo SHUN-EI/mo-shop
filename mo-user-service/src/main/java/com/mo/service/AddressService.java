@@ -15,7 +15,7 @@ import java.util.List;
  * @author mo
  * @since 2021-04-17
  */
-public interface MpAddressService {
+public interface AddressService {
 
     AddressVO detail(Long id);
 
