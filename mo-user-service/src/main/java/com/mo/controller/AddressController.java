@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- *
  * @author mo
  * @since 2021-04-17
  */
@@ -38,7 +37,7 @@ public class AddressController {
     @ApiOperation("根据id删除指定的收货地址")
     @DeleteMapping("/del/{address_id}")
     public JsonData delete(@ApiParam(value = "地址id", required = true)
-                           @PathVariable("address_id") long addressId) {
+                           @PathVariable("address_id") Long addressId) {
 
         int rows = addressService.delete(addressId);
 
@@ -59,7 +58,7 @@ public class AddressController {
     @ApiOperation("根据id查找地址详情")
     @GetMapping("/find/{address_id}")
     public JsonData detail(@ApiParam(value = "地址id", required = true)
-                           @PathVariable("address_id") long addressId) {
+                           @PathVariable("address_id") Long addressId) {
 
         AddressVO addressVO = addressService.detail(addressId);
         return addressVO == null ? JsonData.buildResult(BizCodeEnum.ADDRESS_NOT_EXIST) : JsonData.buildSuccess(addressVO);

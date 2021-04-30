@@ -20,16 +20,16 @@ public class CreateOrderRequest {
      * 若传空或者小于0，则不使用优惠券
      */
     @ApiModelProperty(value = "优惠券id", example = "1")
-    @JsonProperty("coupon_id")
-    private Long couponId;
+    @JsonProperty("coupon_record_id")
+    private Long couponRecordId;
 
     /**
      * 最终购买的商品列表
      * 传递商品id集合，商品的购买数量可从购物车中获取
      */
     @ApiModelProperty(value = "商品id列表", example = "[1,2,3]")
-    @JsonProperty("product_id")
-    private List<Long> productId;
+    @JsonProperty("product_ids")
+    private List<Long> productIds;
 
     /**
      * 支付方式

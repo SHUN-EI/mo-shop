@@ -32,6 +32,10 @@ public class AddressServiceImpl implements AddressService {
     private MpAddressMapper addressMapper;
 
 
+    /**
+     * 查询用户的全部收货地址
+     * @return
+     */
     @Override
     public List<AddressVO> list() {
         //获取当前用户信息，防止越权查询
@@ -49,9 +53,15 @@ public class AddressServiceImpl implements AddressService {
         return addressVOList;
     }
 
+    /**
+     * 根据id删除指定的收货地址
+     *
+     * @param addressId
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
-    public int delete(long addressId) {
+    public int delete(Long addressId) {
         //获取当前用户信息，防止越权删除
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
 
@@ -62,6 +72,11 @@ public class AddressServiceImpl implements AddressService {
         return rows;
     }
 
+    /**
+     * 新增收货地址
+     *
+     * @param request
+     */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public void add(AddressAddRequest request) {
@@ -94,6 +109,12 @@ public class AddressServiceImpl implements AddressService {
         log.info("新增收货地址:rows={},data={}", rows, addressDO);
     }
 
+    /**
+     * 根据id查找地址详情
+     *
+     * @param id
+     * @return
+     */
     @Override
     public AddressVO detail(Long id) {
         //获取当前用户信息，防止越权查询

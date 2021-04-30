@@ -21,7 +21,7 @@ public interface AddressService {
 
     void add(AddressAddRequest request);
 
-    int delete(long addressId);
+    int delete(Long addressId);
 
     List<AddressVO> list();
 }
