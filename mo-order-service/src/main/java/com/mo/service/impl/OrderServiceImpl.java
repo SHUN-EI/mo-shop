@@ -99,7 +99,6 @@ public class OrderServiceImpl implements OrderService {
             log.error("获取收货地址失败,msg:{}", data);
             throw new BizException(BizCodeEnum.ADDRESS_NOT_EXIST);
         }
-
         AddressVO addressVO = data.getData(new TypeReference<>() {
         });
 
