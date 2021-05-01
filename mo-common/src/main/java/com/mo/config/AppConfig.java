@@ -77,7 +77,11 @@ public class AppConfig {
 
     }
 
-
+    /**
+     * Feign远程调用，丢失token的解决方案，增加拦截器，添加token
+     *
+     * @return
+     */
     @Bean("requestInterceptor")
     public RequestInterceptor requestInterceptor() {
 

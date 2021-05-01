@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +26,14 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @ApiOperation("根据商品id批量查询商品")
+    @PostMapping("/findProductsByIdList")
+    public JsonData findProductsByIdList(@ApiParam("商品id列表") @RequestBody List<Long> productIds) {
+
+        List<ProductVO> productVOList = productService.findProductsByIdBatch(productIds);
+        return JsonData.buildSuccess(productVOList);
+    }
 
     @ApiOperation("RPC-锁定商品库存")
     @PostMapping("/lock_products")

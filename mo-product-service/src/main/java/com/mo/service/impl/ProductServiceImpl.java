@@ -130,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
         //找出所有商品id
         List<Long> productIds = orderItemList.stream().map(OrderItemRequest::getProductId).collect(Collectors.toList());
         //根据id批量查询商品
-        List<ProductVO> productVOList = findProductByIdBatch(productIds);
+        List<ProductVO> productVOList = findProductsByIdBatch(productIds);
         //根据商品id把商品分组
         Map<Long, ProductVO> productMap = productVOList.stream().collect(Collectors.toMap(ProductVO::getId, Function.identity()));
 
@@ -179,7 +179,7 @@ public class ProductServiceImpl implements ProductService {
      * @return
      */
     @Override
-    public List<ProductVO> findProductByIdBatch(List<Long> productIds) {
+    public List<ProductVO> findProductsByIdBatch(List<Long> productIds) {
 
         //根据id批量查询商品
         List<MpProductDO> productDOList = productMapper.selectList(new QueryWrapper<MpProductDO>().in("id", productIds));

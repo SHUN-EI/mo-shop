@@ -3,12 +3,15 @@ package com.mo.controller;
 import com.mo.request.CartItemRequest;
 import com.mo.service.CartService;
 import com.mo.utils.JsonData;
+import com.mo.vo.CartItemVO;
 import com.mo.vo.CartVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by mo on 2021/4/25
@@ -20,6 +23,20 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+
+    /**
+     * 用于订单服务，确认订单，获取购物车对应的商品详情信息
+     * 会清空购物车对应的商品
+     *
+     * @param productIds
+     * @return
+     */
+    @ApiOperation("获取对应订单购物车里面的商品信息")
+    @PostMapping("/confirmOrderCartItems")
+    public JsonData confirmOrderCartItems(@ApiParam("商品id列表") @RequestBody List<Long> productIds) {
+        List<CartItemVO> cartItemVOList = cartService.confirmOrderCartItems(productIds);
+        return JsonData.buildSuccess(cartItemVOList);
+    }
 
     @ApiOperation("修改购物车商品数量")
     @PostMapping("/changeItemNum")

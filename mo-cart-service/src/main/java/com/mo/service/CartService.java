@@ -1,7 +1,10 @@
 package com.mo.service;
 
 import com.mo.request.CartItemRequest;
+import com.mo.vo.CartItemVO;
 import com.mo.vo.CartVO;
+
+import java.util.List;
 
 /**
  * Created by mo on 2021/4/25
@@ -17,4 +20,6 @@ public interface CartService {
     void deleteItem(Long productId);
 
     void changeItemNum(CartItemRequest request);
+
+    List<CartItemVO> confirmOrderCartItems(List<Long> productIds);
 }

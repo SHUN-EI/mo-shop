@@ -45,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
 
         //用户微服务-确认收货地址，防止越权
         AddressVO addressVO = getUserAddress(request.getAddressId());
+        log.info("收货地址信息:{}", addressVO);
 
         //商品微服务-获取最新购物车商品项目和价格
 

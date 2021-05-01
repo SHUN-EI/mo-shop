@@ -17,10 +17,10 @@ spring:
     port: 8000
     password: 123456
   flyway:
-    enabled: true
+    enabled: false
     encoding: utf-8
     locations: classpath:db/migration
-    baseline-on-migrate: true
+    baseline-on-migrate: false
     out-of-order: true
     table: flyway_schema_version_history
 #配置plus打印sql日志

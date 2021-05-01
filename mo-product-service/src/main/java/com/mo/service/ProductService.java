@@ -20,7 +20,7 @@ public interface ProductService {
 
     ProductVO findById(Long productId);
 
-    List<ProductVO> findProductByIdBatch(List<Long> productIds);
+    List<ProductVO> findProductsByIdBatch(List<Long> productIds);
 
     JsonData lockProducts(LockProductRequest request);
 

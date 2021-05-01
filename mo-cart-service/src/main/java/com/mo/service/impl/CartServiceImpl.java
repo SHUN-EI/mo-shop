@@ -1,14 +1,16 @@
 package com.mo.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.mo.constant.CacheKey;
 import com.mo.enums.BizCodeEnum;
 import com.mo.exception.BizException;
+import com.mo.feign.ProductFeignService;
 import com.mo.interceptor.LoginInterceptor;
 import com.mo.model.LoginUserDTO;
 import com.mo.request.CartItemRequest;
 import com.mo.service.CartService;
-import com.mo.service.ProductService;
+import com.mo.utils.JsonData;
 import com.mo.vo.CartItemVO;
 import com.mo.vo.CartVO;
 import com.mo.vo.ProductVO;
@@ -33,9 +35,20 @@ import java.util.stream.Collectors;
 public class CartServiceImpl implements CartService {
 
     @Autowired
-    private ProductService productService;
-    @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private ProductFeignService productFeignService;
+
+    /**
+     * 获取对应订单购物车里面的商品信息
+     *
+     * @param productIds
+     * @return
+     */
+    @Override
+    public List<CartItemVO> confirmOrderCartItems(List<Long> productIds) {
+        return null;
+    }
 
     /**
      * 修改购物车商品数量
@@ -132,7 +145,7 @@ public class CartServiceImpl implements CartService {
             CartItemVO cartItemVO = new CartItemVO();
 
             //根据商品id 找出商品
-            ProductVO productVO = productService.findById(productId);
+            ProductVO productVO = getCartItem(productId);
             if (null == productVO) {
                 throw new BizException(BizCodeEnum.CART_FAIL);
             }
@@ -194,7 +207,7 @@ public class CartServiceImpl implements CartService {
      */
     private void setProductLatestAmount(List<CartItemVO> cartItemVOList, List<Long> productIds) {
         //根据id批量查询商品
-        List<ProductVO> productVOList = productService.findProductByIdBatch(productIds);
+        List<ProductVO> productVOList = findProductsByIdBatch(productIds);
 
         //根据商品id把商品分组
         Map<Long, ProductVO> maps = productVOList.stream().collect(Collectors.toMap(ProductVO::getId, Function.identity()));
@@ -232,6 +245,47 @@ public class CartServiceImpl implements CartService {
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
         String cartKey = String.format(CacheKey.CART_KEY, loginUserDTO.getId());
         return cartKey;
+    }
+
+    /**
+     * 根据商品id批量查询商品
+     *
+     * @param productIds
+     * @return
+     */
+    private List<ProductVO> findProductsByIdBatch(List<Long> productIds) {
+        JsonData products = productFeignService.findProductsByIdList(productIds);
+        if (products.getCode() != 0) {
+            log.error("获取商品信息失败,msg:{}", products);
+            throw new BizException(BizCodeEnum.PRODUCT_NOT_EXISTS);
+        }
+
+        List<ProductVO> productVOList = products.getData(new TypeReference<>() {
+        });
+
+        return productVOList;
+    }
+
+
+    /**
+     * 根据商品id获取商品详情
+     *
+     * @param productId
+     * @return
+     */
+    private ProductVO getCartItem(Long productId) {
+        JsonData data = productFeignService.detail(productId);
+
+        if (data.getCode() != 0) {
+            log.error("获取购物车商品详情失败，msg:{}", data);
+            throw new BizException(BizCodeEnum.PRODUCT_NOT_EXISTS);
+        }
+
+        ProductVO productVO = data.getData(new TypeReference<>() {
+        });
+
+        return productVO;
+
     }
 
 }
