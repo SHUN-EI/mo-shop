@@ -2,10 +2,13 @@ package com.mo.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.mo.config.RabbitMQConfig;
 import com.mo.constant.CacheKey;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.LockStateEnum;
 import com.mo.exception.BizException;
+import com.mo.feign.OrderFeignService;
 import com.mo.feign.ProductFeignService;
 import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.CartTaskMapper;
@@ -27,6 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,7 +55,49 @@ public class CartServiceImpl implements CartService {
     private CartTaskMapper cartTaskMapper;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
+    @Autowired
+    private OrderFeignService orderFeignService;
 
+
+    /**
+     * 恢复购物车里面的商品项目
+     * 用于创建订单失败，需要恢复购物车里面的购物项
+     *
+     * @param cartMessage
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public boolean recoverCartItems(CartMessage cartMessage) {
+
+        CartTaskDO cartTaskDO = cartTaskMapper.selectOne(new QueryWrapper<CartTaskDO>().eq("id", cartMessage.getCartTaskId()));
+
+        if (null == cartTaskDO) {
+            log.warn("购物车商品锁定任务不存在，消息体={}", cartMessage);
+            return true;//消息消费
+        }
+
+        LoginUserDTO loginUserDTO = LoginUserDTO.builder().id(cartTaskDO.getUserId()).build();
+        LoginInterceptor.threadLocal.set(loginUserDTO);
+
+        //查询订单状态,远程调用order微服务查询订单状态接口
+        JsonData jsonData = orderFeignService.queryOrderState(cartMessage.getOutTradeNo());
+        if (jsonData.getCode() != 0) {
+            //订单不存在，恢复购物车的商品项目
+            CartItemRequest cartItemRequest = new CartItemRequest();
+            cartItemRequest.setProductId(cartTaskDO.getProductId());
+            cartItemRequest.setBuyNum(cartTaskDO.getBuyNum());
+            addToCart(cartItemRequest);
+
+            //修改购物车商品锁定任务状态为 CANCEL
+            cartTaskDO.setLockState(LockStateEnum.CANCEL.name());
+            cartTaskMapper.update(cartTaskDO, new QueryWrapper<CartTaskDO>().eq("id", cartTaskDO.getId()));
+            return true;//消息消费
+        }
+        return true;
+    }
 
     /**
      * 锁定购物车商品项目
@@ -58,6 +105,7 @@ public class CartServiceImpl implements CartService {
      * @param request
      * @return
      */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public JsonData lockCartItems(LockCartItemsRequest request) {
 
@@ -101,10 +149,13 @@ public class CartServiceImpl implements CartService {
             CartMessage message = new CartMessage();
             message.setOutTradeNo(orderOutTradeNo);
             message.setCartTaskId(cartTaskDO.getId());
+            rabbitTemplate.convertAndSend(rabbitMQConfig.getCartEventExchange(),
+                    rabbitMQConfig.getCartReleaseDelayRoutingKey(), message);
+
+            log.info("购物车商品项目锁定信息发送成功:{}", message);
         });
 
-
-        return null;
+        return JsonData.buildSuccess();
     }
 
     /**
@@ -122,8 +173,6 @@ public class CartServiceImpl implements CartService {
         //根据用户选中的商品id进行过滤，并清空对应的购物项目
         List<CartItemVO> cartItemVOList = latestCartItems.stream().filter(obj -> {
             if (productIds.contains(obj.getProductId())) {
-                //TODO 订单创建成功之后，再删除购物车里面的内容
-
                 //删除购物车里面的购物项目
                 deleteItem(obj.getProductId());
                 return true;

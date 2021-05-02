@@ -16,6 +16,15 @@ spring:
     host: 39.108.182.26
     port: 8000
     password: 123456
+  rabbitmq:   #消息队列
+    host: 39.108.182.26
+    port: 5672
+    virtual-host: /
+    username: admin
+    password: mo12345
+    listener:  #开启手动确认消息
+      simple:
+        acknowledge-mode: manual
   flyway:
     enabled: true
     encoding: utf-8
@@ -31,3 +40,17 @@ mybatis-plus:
 logging:
   level:
     root: INFO
+#自定义消息队列配置，发送锁定库存消息-》延迟exchange-》lock.queue-》死信exchange-》release.queue
+mqconfig:
+  #延迟队列，不能被监听消费
+  cart_release_delay_queue:  cart.release.delay.queue
+  #延迟队列的消息过期后转发的队列-死信队列
+  cart_release_queue: cart.release.queue
+  #交换机
+  cart_event_exchange: cart.event.exchange
+  #进入延迟队列的路由key
+  cart_release_delay_routing_key: cart.release.delay.routing.key
+  #消息过期，进入释放死信队列的key
+  cart_release_routing_key: cart.release.routing.key
+  #消息过期时间,毫秒,测试改为15秒
+  ttl: 15000

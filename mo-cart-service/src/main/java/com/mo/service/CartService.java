@@ -1,5 +1,7 @@
 package com.mo.service;
 
+import com.mo.model.CartMessage;
+import com.mo.model.ProductMessage;
 import com.mo.request.CartItemRequest;
 import com.mo.request.LockCartItemsRequest;
 import com.mo.utils.JsonData;
@@ -26,4 +28,6 @@ public interface CartService {
     List<CartItemVO> confirmOrderCartItems(List<Long> productIds);
 
     JsonData lockCartItems(LockCartItemsRequest request);
+
+    boolean recoverCartItems(CartMessage cartMessage);
 }
