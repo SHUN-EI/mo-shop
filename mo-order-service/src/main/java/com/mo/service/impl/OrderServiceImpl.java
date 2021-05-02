@@ -72,6 +72,8 @@ public class OrderServiceImpl implements OrderService {
 
         //锁定商品库存
 
+        //锁定购物车商品项目
+
         //创建订单对象
 
         //创建订单详情对象

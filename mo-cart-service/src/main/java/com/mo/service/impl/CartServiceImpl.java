@@ -4,11 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.mo.constant.CacheKey;
 import com.mo.enums.BizCodeEnum;
+import com.mo.enums.LockStateEnum;
 import com.mo.exception.BizException;
 import com.mo.feign.ProductFeignService;
 import com.mo.interceptor.LoginInterceptor;
+import com.mo.mapper.CartTaskMapper;
+import com.mo.model.CartMessage;
+import com.mo.model.CartTaskDO;
 import com.mo.model.LoginUserDTO;
 import com.mo.request.CartItemRequest;
+import com.mo.request.LockCartItemsRequest;
+import com.mo.request.OrderItemRequest;
 import com.mo.service.CartService;
 import com.mo.utils.JsonData;
 import com.mo.vo.CartItemVO;
@@ -16,12 +22,14 @@ import com.mo.vo.CartVO;
 import com.mo.vo.ProductVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,6 +46,66 @@ public class CartServiceImpl implements CartService {
     private RedisTemplate redisTemplate;
     @Autowired
     private ProductFeignService productFeignService;
+    @Autowired
+    private CartTaskMapper cartTaskMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
+    /**
+     * 锁定购物车商品项目
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public JsonData lockCartItems(LockCartItemsRequest request) {
+
+        Long userId = request.getUserId();
+        String orderOutTradeNo = request.getOrderOutTradeNo();
+        List<OrderItemRequest> orderItemList = request.getOrderItemList();
+
+        //找出所有商品id
+        List<Long> productIds = orderItemList.stream().map(OrderItemRequest::getProductId).collect(Collectors.toList());
+        JsonData productListData = productFeignService.findProductsByIdList(productIds);
+
+        if (productListData.getCode() != 0) {
+            log.error("获取商品失败,msg={}", productListData);
+            throw new BizException(BizCodeEnum.PRODUCT_NOT_EXISTS);
+        }
+
+        //购物车所有商品
+        List<ProductVO> productVOList = productListData.getData(new TypeReference<>() {
+        });
+        //根据商品id把商品分组
+        Map<Long, ProductVO> productMap = productVOList.stream().collect(Collectors.toMap(ProductVO::getId, Function.identity()));
+
+        //记录购物车商品项目的相关信息
+        orderItemList.forEach(obj -> {
+            ProductVO productVO = productMap.get(obj.getProductId());
+            //插入购物车商品项目锁定任务
+            CartTaskDO cartTaskDO = CartTaskDO.builder()
+                    .userId(userId)
+                    .productId(obj.getProductId())
+                    .buyNum(obj.getBuyNum())
+                    .productName(productVO.getTitle())
+                    .lockState(LockStateEnum.LOCK.name())
+                    .outTradeNo(orderOutTradeNo)
+                    .createTime(new Date())
+                    .updateTime(new Date())
+                    .build();
+
+            cartTaskMapper.insert(cartTaskDO);
+
+            //每一次锁定购物车商品，都要发送延迟消息，若订单创建成功，cartTask为FINISH状态
+            CartMessage message = new CartMessage();
+            message.setOutTradeNo(orderOutTradeNo);
+            message.setCartTaskId(cartTaskDO.getId());
+        });
+
+
+        return null;
+    }
 
     /**
      * 获取对应订单购物车里面的商品信息
@@ -54,6 +122,8 @@ public class CartServiceImpl implements CartService {
         //根据用户选中的商品id进行过滤，并清空对应的购物项目
         List<CartItemVO> cartItemVOList = latestCartItems.stream().filter(obj -> {
             if (productIds.contains(obj.getProductId())) {
+                //TODO 订单创建成功之后，再删除购物车里面的内容
+
                 //删除购物车里面的购物项目
                 deleteItem(obj.getProductId());
                 return true;

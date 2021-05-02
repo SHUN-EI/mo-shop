@@ -1,6 +1,8 @@
 package com.mo.service;
 
 import com.mo.request.CartItemRequest;
+import com.mo.request.LockCartItemsRequest;
+import com.mo.utils.JsonData;
 import com.mo.vo.CartItemVO;
 import com.mo.vo.CartVO;
 
@@ -22,4 +24,6 @@ public interface CartService {
     void changeItemNum(CartItemRequest request);
 
     List<CartItemVO> confirmOrderCartItems(List<Long> productIds);
+
+    JsonData lockCartItems(LockCartItemsRequest request);
 }

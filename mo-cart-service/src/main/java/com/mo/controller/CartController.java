@@ -1,6 +1,7 @@
 package com.mo.controller;
 
 import com.mo.request.CartItemRequest;
+import com.mo.request.LockCartItemsRequest;
 import com.mo.service.CartService;
 import com.mo.utils.JsonData;
 import com.mo.vo.CartItemVO;
@@ -8,6 +9,7 @@ import com.mo.vo.CartVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.checkerframework.checker.index.qual.PolySameLen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,16 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+
+
+    @ApiOperation("RPC-锁定购物车商品项目")
+    @PostMapping("lock_cartItems")
+    public JsonData lockCartItems(@ApiParam("购物车商品项目锁定对象") @RequestBody LockCartItemsRequest request) {
+
+        JsonData jsonData = cartService.lockCartItems(request);
+        return jsonData;
+    }
+
 
     /**
      * 用于订单服务，确认订单，获取购物车对应的商品详情信息

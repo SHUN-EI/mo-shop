@@ -37,5 +37,11 @@
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://39.108.182.26:3306/moshop_order</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="moshop_cart@ali-test" uuid="0316fc49-2336-4d13-8de2-425804aa1a57">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://39.108.182.26:3306/moshop_cart</jdbc-url>
+    </data-source>
   </component>
 </project>
