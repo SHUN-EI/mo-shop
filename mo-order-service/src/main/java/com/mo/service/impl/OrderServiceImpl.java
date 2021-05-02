@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.OrderCodeEnum;
 import com.mo.exception.BizException;
+import com.mo.feign.CartFeignService;
 import com.mo.feign.UserFeignService;
 import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.MpOrderMapper;
@@ -15,10 +16,13 @@ import com.mo.service.OrderService;
 import com.mo.utils.JsonData;
 import com.mo.utils.OrderCodeGenerateUtil;
 import com.mo.vo.AddressVO;
+import com.mo.vo.CartItemVO;
 import com.mysql.cj.log.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author mo
@@ -34,6 +38,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderCodeGenerateUtil orderCodeGenerateUtil;
     @Autowired
     private UserFeignService userFeignService;
+    @Autowired
+    private CartFeignService cartFeignService;
 
     @Override
     public JsonData createOrder(CreateOrderRequest request) {
@@ -48,6 +54,15 @@ public class OrderServiceImpl implements OrderService {
         log.info("收货地址信息:{}", addressVO);
 
         //商品微服务-获取最新购物车商品项目和价格
+        List<Long> productIds = request.getProductIds();
+        JsonData cartItemData = cartFeignService.confirmOrderCartItems(productIds);
+        List<CartItemVO> cartItemVOList = cartItemData.getData(new TypeReference<>() {
+        });
+        log.info("获取对应订单购物车里面的商品信息:{}", cartItemVOList);
+        if (null == cartItemVOList) {
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_CART_ITEM_NOT_EXIST);
+        }
+
 
         //订单验价，后端需要计算校验订单价格，不能单以前端为准
         //优惠券微服务-获取优惠券
