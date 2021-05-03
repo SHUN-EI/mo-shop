@@ -2,6 +2,7 @@ package com.mo.mapper;
 
 import com.mo.model.MpOrderDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MpOrderMapper extends BaseMapper<MpOrderDO> {
 
+    /**
+     * 更新订单状态
+     *
+     * @param outTradeNo
+     * @param newState
+     * @param oldState
+     */
+    void updateOrderState(@Param("outTradeNo") String outTradeNo, @Param("newState") String newState, @Param("oldState") String oldState);
 }

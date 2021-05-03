@@ -27,6 +27,7 @@ import com.mo.vo.CartItemVO;
 import com.mo.vo.CouponRecordVO;
 import com.mysql.cj.log.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -110,6 +111,44 @@ public class OrderServiceImpl implements OrderService {
         //创建支付信息-对接第三方支付
 
         return null;
+    }
+
+    /**
+     * 延迟队列监听，关闭订单
+     *
+     * @param orderMessage
+     * @return
+     */
+    @Override
+    public boolean closeOrder(OrderMessage orderMessage) {
+
+        MpOrderDO orderDO = orderMapper.selectOne(new QueryWrapper<MpOrderDO>().eq("out_trade_no", orderMessage.getOutTradeNo()));
+        if (null == orderDO) {
+            //订单不存在
+            log.warn("订单不存在:{}", orderMessage);
+            return true;//消息消费
+        }
+
+        if (orderDO.getState().equalsIgnoreCase(OrderStateEnum.PAY.name())) {
+            //订单已经支付
+            log.info("订单已经支付:{}", orderMessage);
+            return true;//消息消费
+        }
+
+        //TODO 向第三方支付查询订单是否真的未支付
+
+        String payResult = "";
+        if (StringUtils.isBlank(payResult)) {
+            //查询支付结果为空，则未支付成功，更新订单状态
+            //造成该原因的情况可能是支付通道回调有问题
+            orderMapper.updateOrderState(orderDO.getOutTradeNo(), OrderStateEnum.CANCEL.name(), OrderStateEnum.NEW.name());
+            log.warn("查询支付结果为空，则未支付成功，本地取消订单:{}", orderMessage);
+            return true;//消息消费
+        } else {
+            //支付成功，订单状态改成已支付
+            orderMapper.updateOrderState(orderDO.getOutTradeNo(), OrderStateEnum.PAY.name(), OrderStateEnum.NEW.name());
+            return true;//消息消费
+        }
     }
 
     /**

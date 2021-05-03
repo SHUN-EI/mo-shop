@@ -2,6 +2,7 @@ package com.mo.service;
 
 import com.mo.model.MpOrderDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mo.model.OrderMessage;
 import com.mo.request.CreateOrderRequest;
 import com.mo.utils.JsonData;
 
@@ -14,4 +15,6 @@ public interface OrderService {
     JsonData createOrder(CreateOrderRequest request);
 
     JsonData queryOrderState(String outTradeNo);
+
+    boolean closeOrder(OrderMessage orderMessage);
 }

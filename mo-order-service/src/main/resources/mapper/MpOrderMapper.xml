@@ -4,25 +4,32 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.mo.model.MpOrderDO">
-        <id column="id" property="id" />
-        <result column="out_trade_no" property="outTradeNo" />
-        <result column="state" property="state" />
-        <result column="total_amount" property="totalAmount" />
-        <result column="actual_amount" property="actualAmount" />
-        <result column="pay_type" property="payType" />
-        <result column="user_name" property="userName" />
-        <result column="head_img" property="headImg" />
-        <result column="user_id" property="userId" />
-        <result column="is_deleted" property="isDeleted" />
-        <result column="order_type" property="orderType" />
-        <result column="receiver_address" property="receiverAddress" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="out_trade_no" property="outTradeNo"/>
+        <result column="state" property="state"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="actual_amount" property="actualAmount"/>
+        <result column="pay_type" property="payType"/>
+        <result column="user_name" property="userName"/>
+        <result column="head_img" property="headImg"/>
+        <result column="user_id" property="userId"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="order_type" property="orderType"/>
+        <result column="receiver_address" property="receiverAddress"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, out_trade_no, state, total_amount, actual_amount, pay_type, user_name, head_img, user_id, is_deleted, order_type, receiver_address, create_time, update_time
     </sql>
+
+    <!--更新订单状态-->
+    <update id="updateOrderState">
+        update  mp_order set `state`=#{newState}
+        where out_trade_no=#{outTradeNo} and `state`=#{oldState}
+
+    </update>
 
 </mapper>
