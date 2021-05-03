@@ -1,5 +1,6 @@
 package com.mo.feign;
 
+import com.mo.request.LockCartItemsRequest;
 import com.mo.utils.JsonData;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +16,19 @@ public interface CartFeignService {
 
     /**
      * 获取对应订单购物车里面的商品信息
+     *
      * @param productIds
      * @return
      */
     @PostMapping("/api/cart/v1/confirmOrderCartItems")
     JsonData confirmOrderCartItems(@RequestBody List<Long> productIds);
+
+    /**
+     * 锁定购物车商品项目
+     *
+     * @param request
+     * @return
+     */
+    @PostMapping("/api/cart/v1/lock_cartItems")
+    JsonData lockCartItems(@RequestBody LockCartItemsRequest request);
 }

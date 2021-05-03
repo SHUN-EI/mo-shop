@@ -14,10 +14,7 @@ import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.MpOrderMapper;
 import com.mo.model.LoginUserDTO;
 import com.mo.model.MpOrderDO;
-import com.mo.request.CreateOrderRequest;
-import com.mo.request.LockCouponRecordRequest;
-import com.mo.request.LockProductRequest;
-import com.mo.request.OrderItemRequest;
+import com.mo.request.*;
 import com.mo.service.OrderService;
 import com.mo.utils.CommonUtil;
 import com.mo.utils.JsonData;
@@ -87,7 +84,8 @@ public class OrderServiceImpl implements OrderService {
         //锁定商品库存
         lockProducts(cartItemVOList, outTradeNo);
 
-        //锁定购物车商品项目
+        //锁定购物车商品项目,用于订单创建失败，恢复购物车商品项目
+        lockCartItems(loginUserDTO.getId(), cartItemVOList, outTradeNo);
 
         //创建订单对象
 
@@ -98,6 +96,32 @@ public class OrderServiceImpl implements OrderService {
         //创建支付信息-对接第三方支付
 
         return null;
+    }
+
+    /**
+     * 锁定购物车商品项目
+     *
+     * @param id
+     * @param cartItemVOList
+     * @param outTradeNo
+     */
+    private void lockCartItems(Long id, List<CartItemVO> cartItemVOList, String outTradeNo) {
+        List<OrderItemRequest> orderItemRequestList = cartItemVOList.stream().map(obj -> {
+            OrderItemRequest request = new OrderItemRequest();
+            request.setProductId(obj.getProductId());
+            request.setBuyNum(obj.getBuyNum());
+            return request;
+        }).collect(Collectors.toList());
+
+        LockCartItemsRequest lockCartItemsRequest = new LockCartItemsRequest();
+        lockCartItemsRequest.setUserId(id);
+        lockCartItemsRequest.setOrderOutTradeNo(outTradeNo);
+        lockCartItemsRequest.setOrderItemList(orderItemRequestList);
+        JsonData jsonData = cartFeignService.lockCartItems(lockCartItemsRequest);
+        if (jsonData.getCode() != 0) {
+            log.error("购物车商品项目锁定失败:{}", lockCartItemsRequest);
+            throw new BizException(BizCodeEnum.CART_ITEM_LOCK_FAIL);
+        }
     }
 
     /**

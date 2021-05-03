@@ -28,7 +28,7 @@ public class CartController {
 
 
     @ApiOperation("RPC-锁定购物车商品项目")
-    @PostMapping("lock_cartItems")
+    @PostMapping("/lock_cartItems")
     public JsonData lockCartItems(@ApiParam("购物车商品项目锁定对象") @RequestBody LockCartItemsRequest request) {
 
         JsonData jsonData = cartService.lockCartItems(request);

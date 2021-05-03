@@ -19,7 +19,8 @@ public enum BizCodeEnum {
     /**
      * 购物车
      */
-    CART_FAIL(220001,"添加购物车失败"),
+    CART_FAIL(220001, "添加购物车失败"),
+    CART_ITEM_LOCK_FAIL(220002, "购物车商品项目锁定失败"),
 
     /**
      * 验证码
@@ -40,38 +41,38 @@ public enum BizCodeEnum {
     /**
      * 商品
      */
-    PRODUCT_NOT_EXISTS(260001,"商品不存在"),
+    PRODUCT_NOT_EXISTS(260001, "商品不存在"),
 
     /**
      * 优惠券
      */
-    COUPON_CONDITION_ERROR(270001,"优惠券条件错误"),
-    COUPON_UNAVAILABLE(270002,"没有可用的优惠券"),
-    COUPON_NO_EXITS(270003,"优惠券不存在"),
-    COUPON_NO_STOCK(270005,"优惠券库存不足"),
-    COUPON_OUT_OF_LIMIT(270006,"优惠券领取超过限制次数"),
-    COUPON_OUT_OF_TIME(270407,"优惠券不在领取时间范围"),
-    COUPON_GET_FAIL(270407,"优惠券领取失败"),
-    COUPON_RECORD_LOCK_FAIL(270409,"优惠券锁定失败"),
+    COUPON_CONDITION_ERROR(270001, "优惠券条件错误"),
+    COUPON_UNAVAILABLE(270002, "没有可用的优惠券"),
+    COUPON_NO_EXITS(270003, "优惠券不存在"),
+    COUPON_NO_STOCK(270005, "优惠券库存不足"),
+    COUPON_OUT_OF_LIMIT(270006, "优惠券领取超过限制次数"),
+    COUPON_OUT_OF_TIME(270407, "优惠券不在领取时间范围"),
+    COUPON_GET_FAIL(270407, "优惠券领取失败"),
+    COUPON_RECORD_LOCK_FAIL(270409, "优惠券锁定失败"),
 
     /**
      * 订单
      */
-    ORDER_CONFIRM_COUPON_FAIL(280001,"创建订单-优惠券使用失败,不满足价格条件"),
-    ORDER_CONFIRM_PRICE_FAIL(280002,"创建订单-验价失败"),
-    ORDER_CONFIRM_LOCK_PRODUCT_FAIL(280003,"创建订单-商品库存不足锁定失败"),
-    ORDER_CONFIRM_ADD_STOCK_TASK_FAIL(280004,"创建订单-新增商品库存锁定任务"),
-    ORDER_CONFIRM_TOKEN_NOT_EXIST(280008,"订单令牌缺少"),
-    ORDER_CONFIRM_TOKEN_EQUAL_FAIL(280009,"订单令牌不正确"),
-    ORDER_CONFIRM_NOT_EXIST(280010,"订单不存在"),
-    ORDER_CONFIRM_CART_ITEM_NOT_EXIST(280011,"购物车商品项不存在"),
+    ORDER_CONFIRM_COUPON_FAIL(280001, "创建订单-优惠券使用失败,不满足价格条件"),
+    ORDER_CONFIRM_PRICE_FAIL(280002, "创建订单-验价失败"),
+    ORDER_CONFIRM_LOCK_PRODUCT_FAIL(280003, "创建订单-商品库存不足锁定失败"),
+    ORDER_CONFIRM_ADD_STOCK_TASK_FAIL(280004, "创建订单-新增商品库存锁定任务"),
+    ORDER_CONFIRM_TOKEN_NOT_EXIST(280008, "订单令牌缺少"),
+    ORDER_CONFIRM_TOKEN_EQUAL_FAIL(280009, "订单令牌不正确"),
+    ORDER_CONFIRM_NOT_EXIST(280010, "订单不存在"),
+    ORDER_CONFIRM_CART_ITEM_NOT_EXIST(280011, "购物车商品项不存在"),
 
     /**
      * 收货地址
      */
-    ADDRESS_ADD_FAIL(290001,"新增收货地址失败"),
-    ADDRESS_DEL_FAIL(290002,"删除收货地址失败"),
-    ADDRESS_NOT_EXIST(290003,"收货地址不存在"),
+    ADDRESS_ADD_FAIL(290001, "新增收货地址失败"),
+    ADDRESS_DEL_FAIL(290002, "删除收货地址失败"),
+    ADDRESS_NOT_EXIST(290003, "收货地址不存在"),
 
 
     /**
