@@ -3,6 +3,7 @@ package com.mo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.mo.config.RabbitMQConfig;
 import com.mo.enums.*;
 import com.mo.exception.BizException;
 import com.mo.feign.CartFeignService;
@@ -15,6 +16,7 @@ import com.mo.mapper.MpOrderMapper;
 import com.mo.model.LoginUserDTO;
 import com.mo.model.MpOrderDO;
 import com.mo.model.MpOrderDetailDO;
+import com.mo.model.OrderMessage;
 import com.mo.request.*;
 import com.mo.service.OrderService;
 import com.mo.utils.CommonUtil;
@@ -25,6 +27,7 @@ import com.mo.vo.CartItemVO;
 import com.mo.vo.CouponRecordVO;
 import com.mysql.cj.log.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +59,10 @@ public class OrderServiceImpl implements OrderService {
     private ProductFeignService productFeignService;
     @Autowired
     private MpOrderDetailMapper orderDetailMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     @Override
     public JsonData createOrder(CreateOrderRequest request) {
@@ -98,10 +105,24 @@ public class OrderServiceImpl implements OrderService {
         saveOrderDetail(orderDO.getId(), outTradeNo, cartItemVOList);
 
         //发送延迟消息-用于自动关单
+        sendOrderCloseMessage(outTradeNo);
 
         //创建支付信息-对接第三方支付
 
         return null;
+    }
+
+    /**
+     * 发送延迟消息-用于自动关单
+     *
+     * @param outTradeNo
+     */
+    private void sendOrderCloseMessage(String outTradeNo) {
+
+        OrderMessage message = new OrderMessage();
+        message.setOutTradeNo(outTradeNo);
+        rabbitTemplate.convertAndSend(rabbitMQConfig.getOrderEventExchange(),
+                rabbitMQConfig.getOrderCloseDelayRoutingKey(), message);
     }
 
     /**
