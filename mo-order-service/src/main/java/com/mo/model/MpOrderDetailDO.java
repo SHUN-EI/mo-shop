@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,6 +23,7 @@ import lombok.EqualsAndHashCode;
  * @author mo
  * @since 2021-04-26
  */
+@Builder
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("mp_order_detail")
@@ -38,7 +40,7 @@ public class MpOrderDetailDO implements Serializable {
     /**
      * 订单号
      */
-    private Long productOrderId;
+    private Long orderId;
 
     /**
      * 订单唯一标识

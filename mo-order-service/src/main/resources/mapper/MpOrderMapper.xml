@@ -8,9 +8,9 @@
         <result column="out_trade_no" property="outTradeNo" />
         <result column="state" property="state" />
         <result column="total_amount" property="totalAmount" />
-        <result column="pay_amount" property="payAmount" />
+        <result column="actual_amount" property="actualAmount" />
         <result column="pay_type" property="payType" />
-        <result column="nickname" property="nickname" />
+        <result column="user_name" property="userName" />
         <result column="head_img" property="headImg" />
         <result column="user_id" property="userId" />
         <result column="is_deleted" property="isDeleted" />
@@ -22,7 +22,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, out_trade_no, state, total_amount, pay_amount, pay_type, nickname, head_img, user_id, is_deleted, order_type, receiver_address, create_time, update_time
+        id, out_trade_no, state, total_amount, actual_amount, pay_type, user_name, head_img, user_id, is_deleted, order_type, receiver_address, create_time, update_time
     </sql>
 
 </mapper>

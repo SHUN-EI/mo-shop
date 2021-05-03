@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,6 +23,7 @@ import lombok.EqualsAndHashCode;
  * @author mo
  * @since 2021-04-26
  */
+@Builder
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("mp_order")
@@ -53,17 +55,12 @@ public class MpOrderDO implements Serializable {
     /**
      * 订单实际支付价格
      */
-    private BigDecimal payAmount;
+    private BigDecimal actualAmount;
 
     /**
      * 支付类型，微信-银行-支付宝
      */
     private String payType;
-
-    /**
-     * 昵称
-     */
-    private String nickname;
 
     /**
      * 头像
@@ -73,7 +70,12 @@ public class MpOrderDO implements Serializable {
     /**
      * 用户id
      */
-    private Integer userId;
+    private Long userId;
+
+    /**
+     * 昵称,用户名
+     */
+    private String userName;
 
     /**
      * 0表示未删除，1表示已经删除

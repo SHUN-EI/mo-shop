@@ -1,19 +1,20 @@
 package com.mo.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.mo.enums.BizCodeEnum;
-import com.mo.enums.CouponStateEnum;
-import com.mo.enums.OrderCodeEnum;
+import com.mo.enums.*;
 import com.mo.exception.BizException;
 import com.mo.feign.CartFeignService;
 import com.mo.feign.CouponFeignService;
 import com.mo.feign.ProductFeignService;
 import com.mo.feign.UserFeignService;
 import com.mo.interceptor.LoginInterceptor;
+import com.mo.mapper.MpOrderDetailMapper;
 import com.mo.mapper.MpOrderMapper;
 import com.mo.model.LoginUserDTO;
 import com.mo.model.MpOrderDO;
+import com.mo.model.MpOrderDetailDO;
 import com.mo.request.*;
 import com.mo.service.OrderService;
 import com.mo.utils.CommonUtil;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +54,8 @@ public class OrderServiceImpl implements OrderService {
     private CouponFeignService couponFeignService;
     @Autowired
     private ProductFeignService productFeignService;
+    @Autowired
+    private MpOrderDetailMapper orderDetailMapper;
 
     @Override
     public JsonData createOrder(CreateOrderRequest request) {
@@ -88,14 +92,76 @@ public class OrderServiceImpl implements OrderService {
         lockCartItems(loginUserDTO.getId(), cartItemVOList, outTradeNo);
 
         //创建订单对象
+        MpOrderDO orderDO = saveOrder(request, loginUserDTO, outTradeNo, addressVO);
 
         //创建订单详情对象
+        saveOrderDetail(orderDO.getId(), outTradeNo, cartItemVOList);
 
         //发送延迟消息-用于自动关单
 
         //创建支付信息-对接第三方支付
 
         return null;
+    }
+
+    /**
+     * 创建订单详情
+     *
+     * @param orderId
+     * @param outTradeNo
+     * @param cartItemVOList
+     */
+    private void saveOrderDetail(Long orderId, String outTradeNo, List<CartItemVO> cartItemVOList) {
+
+        List<MpOrderDetailDO> orderDetailDOList = cartItemVOList.stream().map(obj -> {
+            MpOrderDetailDO orderDetailDO = MpOrderDetailDO.builder()
+                    .orderId(orderId)
+                    .outTradeNo(outTradeNo)
+                    .productId(obj.getProductId())
+                    .buyNum(obj.getBuyNum())
+                    .productImg(obj.getProductImg())
+                    .productName(obj.getProductTitle())
+                    .amount(obj.getAmount())
+                    .totalAmount(obj.getTotalAmount())
+                    .createTime(new Date())
+                    .updateTime(new Date())
+                    .build();
+            return orderDetailDO;
+        }).collect(Collectors.toList());
+
+        orderDetailMapper.insertBatch(orderDetailDOList);
+
+    }
+
+    /**
+     * 创建订单
+     *
+     * @param request
+     * @param loginUserDTO
+     * @param outTradeNo
+     * @param addressVO
+     * @return
+     */
+    private MpOrderDO saveOrder(CreateOrderRequest request, LoginUserDTO loginUserDTO, String outTradeNo, AddressVO addressVO) {
+        MpOrderDO orderDO = MpOrderDO.builder()
+                .userId(loginUserDTO.getId())
+                .headImg(loginUserDTO.getHeadImg())
+                .userName(loginUserDTO.getUserName())
+                .outTradeNo(outTradeNo)
+                .createTime(new Date())
+                .updateTime(new Date())
+                .isDeleted(0)
+                .orderType(OrderTypeEnum.DAILY.name())
+                .actualAmount(request.getActualAmount())//实际支付价格
+                .totalAmount(request.getTotalAmount())
+                .state(OrderStateEnum.NEW.name())//订单状态
+                .payType(OrderPayTypeEnum.valueOf(request.getPayType()).name())
+                .receiverAddress(JSON.toJSONString(addressVO))
+                .build();
+
+        orderMapper.insert(orderDO);
+
+        return orderDO;
     }
 
     /**

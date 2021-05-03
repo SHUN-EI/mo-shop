@@ -2,6 +2,9 @@ package com.mo.mapper;
 
 import com.mo.model.MpOrderDetailDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MpOrderDetailMapper extends BaseMapper<MpOrderDetailDO> {
 
+    /**
+     * 批量插入订单详情对象
+     *
+     * @param orderDetailList
+     */
+    void insertBatch(@Param("orderDetailList") List<MpOrderDetailDO> orderDetailList);
 }
