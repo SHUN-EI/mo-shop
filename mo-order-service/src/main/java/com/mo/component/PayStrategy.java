@@ -1,6 +1,6 @@
 package com.mo.component;
 
-import com.mo.vo.PayInfoVo;
+import com.mo.vo.PayInfoVO;
 
 /**
  * Created by mo on 2021/5/4
@@ -10,28 +10,28 @@ public interface PayStrategy {
     /**
      * 下单
      *
-     * @param payInfoVo
+     * @param payInfoVO
      * @return
      */
-    String unifiedorder(PayInfoVo payInfoVo);
+    String unifiedorder(PayInfoVO payInfoVO);
 
     /**
      * 退款
      *
-     * @param payInfoVo
+     * @param payInfoVO
      * @return
      */
-    default String refund(PayInfoVo payInfoVo) {
+    default String refund(PayInfoVO payInfoVO) {
         return "";
     }
 
     /**
      * 查询支付是否成功
      *
-     * @param payInfoVo
+     * @param payInfoVO
      * @return
      */
-    default String queryPaySuccess(PayInfoVo payInfoVo) {
+    default String queryPaySuccess(PayInfoVO payInfoVO) {
         return "";
     }
 

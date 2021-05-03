@@ -1,6 +1,6 @@
 package com.mo.component;
 
-import com.mo.vo.PayInfoVo;
+import com.mo.vo.PayInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -12,17 +12,17 @@ import org.springframework.stereotype.Component;
 public class WechatPayStrategy implements PayStrategy {
 
     @Override
-    public String unifiedorder(PayInfoVo payInfoVo) {
+    public String unifiedorder(PayInfoVO payInfoVO) {
         return null;
     }
 
     @Override
-    public String refund(PayInfoVo payInfoVo) {
+    public String refund(PayInfoVO payInfoVO) {
         return null;
     }
 
     @Override
-    public String queryPaySuccess(PayInfoVo payInfoVo) {
+    public String queryPaySuccess(PayInfoVO payInfoVO) {
         return null;
     }
 }

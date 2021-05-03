@@ -1,6 +1,6 @@
 package com.mo.component;
 
-import com.mo.vo.PayInfoVo;
+import com.mo.vo.PayInfoVO;
 
 /**
  * Created by mo on 2021/5/4
@@ -16,20 +16,20 @@ public class PayStrategyContext {
     /**
      * 根据支付策略，调用不同的支付
      *
-     * @param payInfoVo
+     * @param payInfoVO
      * @return
      */
-    public String executeUnifiedorder(PayInfoVo payInfoVo) {
-        return this.payStrategy.unifiedorder(payInfoVo);
+    public String executeUnifiedorder(PayInfoVO payInfoVO) {
+        return this.payStrategy.unifiedorder(payInfoVO);
     }
 
     /**
      * 根据支付的策略，调用不同的查询订单支持状态
      *
-     * @param payInfoVo
+     * @param payInfoVO
      * @return
      */
-    public String executeQueryPaySuccess(PayInfoVo payInfoVo) {
-        return this.payStrategy.queryPaySuccess(payInfoVo);
+    public String executeQueryPaySuccess(PayInfoVO payInfoVO) {
+        return this.payStrategy.queryPaySuccess(payInfoVO);
     }
 }

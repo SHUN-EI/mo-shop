@@ -1,7 +1,7 @@
 package com.mo.component;
 
 import com.mo.enums.OrderPayTypeEnum;
-import com.mo.vo.PayInfoVo;
+import com.mo.vo.PayInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,19 +19,19 @@ public class PayFactory {
     /**
      * 创建支付，简单工厂设计模式
      *
-     * @param payInfoVo
+     * @param payInfoVO
      * @return
      */
-    public String pay(PayInfoVo payInfoVo) {
-        String payType = payInfoVo.getPayType();
+    public String pay(PayInfoVO payInfoVO) {
+        String payType = payInfoVO.getPayType();
         if (OrderPayTypeEnum.ALIPAY.name().equalsIgnoreCase(payType)) {
             //支付宝支付
             PayStrategyContext payStrategyContext = new PayStrategyContext(alipayStrategy);
-            return payStrategyContext.executeUnifiedorder(payInfoVo);
+            return payStrategyContext.executeUnifiedorder(payInfoVO);
         } else if (OrderPayTypeEnum.WECHAT.name().equalsIgnoreCase(payType)) {
             //微信支付
             PayStrategyContext payStrategyContext = new PayStrategyContext(wechatPayStrategy);
-            return payStrategyContext.executeUnifiedorder(payInfoVo);
+            return payStrategyContext.executeUnifiedorder(payInfoVO);
         }
 
         return null;
@@ -42,19 +42,19 @@ public class PayFactory {
      * 查询订单支付状态
      * 支付成功返回非空，其他返回空
      *
-     * @param payInfoVo
+     * @param payInfoVO
      * @return
      */
-    public String queryPaySuccess(PayInfoVo payInfoVo) {
-        String payType = payInfoVo.getPayType();
+    public String queryPaySuccess(PayInfoVO payInfoVO) {
+        String payType = payInfoVO.getPayType();
         if (OrderPayTypeEnum.ALIPAY.name().equalsIgnoreCase(payType)) {
             //支付宝支付
             PayStrategyContext payStrategyContext = new PayStrategyContext(alipayStrategy);
-            return payStrategyContext.executeQueryPaySuccess(payInfoVo);
+            return payStrategyContext.executeQueryPaySuccess(payInfoVO);
         } else if (OrderPayTypeEnum.WECHAT.name().equalsIgnoreCase(payType)) {
             //微信支付
             PayStrategyContext payStrategyContext = new PayStrategyContext(wechatPayStrategy);
-            return payStrategyContext.executeQueryPaySuccess(payInfoVo);
+            return payStrategyContext.executeQueryPaySuccess(payInfoVO);
         }
 
         return null;

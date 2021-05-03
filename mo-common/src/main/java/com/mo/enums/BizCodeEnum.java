@@ -76,6 +76,16 @@ public enum BizCodeEnum {
 
 
     /**
+     * 支付
+     */
+    PAY_ORDER_FAIL(300001,"创建支付订单失败"),
+    PAY_ORDER_CALLBACK_SIGN_FAIL(300002,"支付订单回调验证签失败"),
+    PAY_ORDER_CALLBACK_NOT_SUCCESS(300003,"创建支付订单失败"),
+    PAY_ORDER_NOT_EXIST(300005,"订单不存在"),
+    PAY_ORDER_STATE_ERROR(300006,"订单状态不正常"),
+    PAY_ORDER_PAY_TIMEOUT(300007,"订单支付超时"),
+
+    /**
      * 文件相关
      */
     FILE_UPLOAD_USER_IMG_FAILED(600001, "用户头像文件上传失败");

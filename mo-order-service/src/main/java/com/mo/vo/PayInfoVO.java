@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PayInfoVo {
+public class PayInfoVO {
 
     /**
      * 订单号
