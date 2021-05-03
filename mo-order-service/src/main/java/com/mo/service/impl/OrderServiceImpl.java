@@ -8,12 +8,16 @@ import com.mo.enums.OrderCodeEnum;
 import com.mo.exception.BizException;
 import com.mo.feign.CartFeignService;
 import com.mo.feign.CouponFeignService;
+import com.mo.feign.ProductFeignService;
 import com.mo.feign.UserFeignService;
 import com.mo.interceptor.LoginInterceptor;
 import com.mo.mapper.MpOrderMapper;
 import com.mo.model.LoginUserDTO;
 import com.mo.model.MpOrderDO;
 import com.mo.request.CreateOrderRequest;
+import com.mo.request.LockCouponRecordRequest;
+import com.mo.request.LockProductRequest;
+import com.mo.request.OrderItemRequest;
 import com.mo.service.OrderService;
 import com.mo.utils.CommonUtil;
 import com.mo.utils.JsonData;
@@ -27,7 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author mo
@@ -47,6 +53,8 @@ public class OrderServiceImpl implements OrderService {
     private CartFeignService cartFeignService;
     @Autowired
     private CouponFeignService couponFeignService;
+    @Autowired
+    private ProductFeignService productFeignService;
 
     @Override
     public JsonData createOrder(CreateOrderRequest request) {
@@ -73,11 +81,11 @@ public class OrderServiceImpl implements OrderService {
         //订单验证价格，后端需要计算校验订单价格，不能单以前端为准
         checkPrice(cartItemVOList, request);
 
-        //优惠券微服务-获取优惠券
-
         //锁定优惠券
+        lockCouponRecords(request, outTradeNo);
 
         //锁定商品库存
+        lockProducts(cartItemVOList, outTradeNo);
 
         //锁定购物车商品项目
 
@@ -90,6 +98,58 @@ public class OrderServiceImpl implements OrderService {
         //创建支付信息-对接第三方支付
 
         return null;
+    }
+
+    /**
+     * 锁定商品库存
+     *
+     * @param cartItemVOList
+     * @param outTradeNo
+     */
+    private void lockProducts(List<CartItemVO> cartItemVOList, String outTradeNo) {
+        List<OrderItemRequest> orderItemRequestList = cartItemVOList.stream().map(obj -> {
+            OrderItemRequest request = new OrderItemRequest();
+            request.setBuyNum(obj.getBuyNum());
+            request.setProductId(obj.getProductId());
+            return request;
+        }).collect(Collectors.toList());
+
+        LockProductRequest lockProductRequest = new LockProductRequest();
+        lockProductRequest.setOrderOutTradeNo(outTradeNo);
+        lockProductRequest.setOrderItemList(orderItemRequestList);
+        JsonData jsonData = productFeignService.lockProducts(lockProductRequest);
+        if (jsonData.getCode() != 0) {
+            log.error("锁定商品库存失败:{}", lockProductRequest);
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_LOCK_PRODUCT_FAIL);
+        }
+
+    }
+
+
+    /**
+     * 锁定优惠券
+     *
+     * @param request
+     * @param outTradeNo
+     */
+    private void lockCouponRecords(CreateOrderRequest request, String outTradeNo) {
+
+        List<Long> lockCouponRecordIds = new ArrayList<>();
+        //订单有使用优惠券
+        if (request.getCouponRecordId() > 0) {
+            lockCouponRecordIds.add(request.getCouponRecordId());
+            LockCouponRecordRequest lockCouponRecordRequest = new LockCouponRecordRequest();
+            lockCouponRecordRequest.setOrderOutTradeNo(outTradeNo);
+            lockCouponRecordRequest.setLockCouponRecordIds(lockCouponRecordIds);
+
+            //发送优惠券锁定请求
+            JsonData jsonData = couponFeignService.lockCouponRecords(lockCouponRecordRequest);
+            if (jsonData.getCode() != 0) {
+                log.error("锁定优惠券失败:{}", lockCouponRecordRequest);
+                throw new BizException(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
+            }
+        }
+
     }
 
     /**
