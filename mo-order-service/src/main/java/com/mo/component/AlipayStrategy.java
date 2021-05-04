@@ -64,6 +64,7 @@ public class AlipayStrategy implements PayStrategy {
 
         //端类型
         String clientType = payInfoVO.getClientType();
+        //返回的表单数据
         String formData = "";
 
         try {
@@ -149,7 +150,7 @@ public class AlipayStrategy implements PayStrategy {
             return response.getBody();
         } else {
             log.info("支付宝订单状态查询失败:{}", payInfoVO);
-            return null;
+            return "";
         }
     }
 }

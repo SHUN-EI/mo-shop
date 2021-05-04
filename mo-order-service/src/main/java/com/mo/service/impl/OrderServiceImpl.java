@@ -3,7 +3,9 @@ package com.mo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.mo.component.PayFactory;
 import com.mo.config.RabbitMQConfig;
+import com.mo.constant.TimeConstant;
 import com.mo.enums.*;
 import com.mo.exception.BizException;
 import com.mo.feign.CartFeignService;
@@ -25,6 +27,7 @@ import com.mo.utils.OrderCodeGenerateUtil;
 import com.mo.vo.AddressVO;
 import com.mo.vo.CartItemVO;
 import com.mo.vo.CouponRecordVO;
+import com.mo.vo.PayInfoVO;
 import com.mysql.cj.log.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -65,6 +68,8 @@ public class OrderServiceImpl implements OrderService {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
+    @Autowired
+    private PayFactory payFactory;
 
     private static final String TRADE_SUCCESS = "TRADE_SUCCESS";
 
@@ -114,8 +119,23 @@ public class OrderServiceImpl implements OrderService {
         sendOrderCloseMessage(outTradeNo);
 
         //创建支付信息-对接第三方支付
+        PayInfoVO payInfoVO = PayInfoVO.builder()
+                .outTradeNo(outTradeNo)
+                .payType(request.getPayType())
+                .totalAmount(request.getTotalAmount())
+                .clientType(request.getClientType())
+                .title("订单号:" + outTradeNo + cartItemVOList.get(0).getProductTitle())
+                .description(outTradeNo)
+                .orderPayTimeoutMills(TimeConstant.ORDER_PAY_TIMEOUT_MILLS)
+                .build();
 
-        return null;
+        String payResult = payFactory.pay(payInfoVO);
+        if (StringUtils.isNotBlank(payResult)) {
+            return JsonData.buildSuccess(payResult);
+        } else {
+            log.error("创建支付订单失败: payInfoVO={},payResult={}", payInfoVO, payResult);
+            return JsonData.buildResult(BizCodeEnum.PAY_ORDER_FAIL);
+        }
     }
 
     /**
@@ -166,9 +186,14 @@ public class OrderServiceImpl implements OrderService {
             return true;//消息消费
         }
 
-        //TODO 向第三方支付查询订单是否真的未支付
+        //向第三方支付查询订单是否真的未支付
+        PayInfoVO payInfoVO = PayInfoVO.builder()
+                .outTradeNo(orderMessage.getOutTradeNo())
+                .payType(orderDO.getPayType())
+                .build();
 
-        String payResult = "";
+        String payResult = payFactory.queryPaySuccess(payInfoVO);
+
         if (StringUtils.isBlank(payResult)) {
             //查询支付结果为空，则未支付成功，更新订单状态
             //造成该原因的情况可能是支付通道回调有问题

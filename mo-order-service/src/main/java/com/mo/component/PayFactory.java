@@ -34,12 +34,12 @@ public class PayFactory {
             return payStrategyContext.executeUnifiedorder(payInfoVO);
         }
 
-        return null;
+        return "";
     }
 
 
     /**
-     * 查询订单支付状态
+     * 查询订单支付状态 简单工厂设计模式
      * 支付成功返回非空，其他返回空
      *
      * @param payInfoVO
@@ -57,6 +57,6 @@ public class PayFactory {
             return payStrategyContext.executeQueryPaySuccess(payInfoVO);
         }
 
-        return null;
+        return "";
     }
 }
