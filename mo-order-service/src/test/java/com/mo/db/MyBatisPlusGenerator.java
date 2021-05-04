@@ -23,8 +23,8 @@ public class MyBatisPlusGenerator {
         config.setAuthor("mo")
                 // 生成路径，最好使用绝对路径，window路径是不一样的
                 //TODO  TODO  TODO  TODO
-//                .setOutputDir("/Users/xdclass/Desktop/demo/src/main/java") //这是绝对路径,可以存放在一个另外的目录下，然后再复制进项目
-                .setOutputDir("mo-order-service/src/main/java")//相对路径
+                .setOutputDir("/Users/mo/develop/mbp-test") //这是绝对路径,可以存放在一个另外的目录下，然后再复制进项目
+                //.setOutputDir("mo-order-service/src/main/java")//相对路径
                 // 文件覆盖
                 .setFileOverride(true)
                 // 主键策略
