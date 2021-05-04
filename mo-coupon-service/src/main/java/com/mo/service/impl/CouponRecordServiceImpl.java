@@ -137,14 +137,15 @@ public class CouponRecordServiceImpl implements CouponRecordService {
                 CouponStateEnum.NEW.name(), lockCouponRecordIds);
 
         List<CouponTaskDO> couponTaskDOList = lockCouponRecordIds.stream().map(obj -> {
-            CouponTaskDO couponTaskDO = new CouponTaskDO();
-            couponTaskDO.setOutTradeNo(orderOutTradeNo);
-            couponTaskDO.setCouponRecordId(obj);
-            couponTaskDO.setCreateTime(new Date());
-            couponTaskDO.setUpdateTime(new Date());
-            couponTaskDO.setLockState(LockStateEnum.LOCK.name());
+            CouponTaskDO taskDO = CouponTaskDO.builder()
+                    .outTradeNo(orderOutTradeNo)
+                    .couponRecordId(obj)
+                    .lockState(LockStateEnum.LOCK.name())
+                    .createTime(new Date())
+                    .updateTime(new Date())
+                    .build();
 
-            return couponTaskDO;
+            return taskDO;
         }).collect(Collectors.toList());
 
         //优惠券库存锁定任务表中 插入记录

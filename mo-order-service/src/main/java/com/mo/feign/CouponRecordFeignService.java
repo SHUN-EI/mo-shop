@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * Created by mo on 2021/5/3
  */
 @FeignClient(name = "mo-coupon-service")
-public interface CouponFeignService {
+public interface CouponRecordFeignService {
 
     /**
      * 查询用户优惠券领券记录详情，防止水平越权
@@ -20,7 +20,7 @@ public interface CouponFeignService {
      * @param recordId
      * @return
      */
-    @GetMapping("/api/coupon_record/v1/detail/{record_id}")
+    @GetMapping("/api/couponRecord/v1/detail/{record_id}")
     JsonData findUserCouponRecord(@PathVariable("record_id") Long recordId);
 
     /**
@@ -29,6 +29,6 @@ public interface CouponFeignService {
      * @param lockCouponRecordRequest
      * @return
      */
-    @PostMapping("/api/coupon_record/v1/lock_coupon_records")
+    @PostMapping("/api/couponRecord/v1/lock_coupon_records")
     JsonData lockCouponRecords(@RequestBody LockCouponRecordRequest lockCouponRecordRequest);
 }

@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Api(tags = "优惠券领券记录模块")
 @RestController
-@RequestMapping("/api/coupon_record/v1")
+@RequestMapping("/api/couponRecord/v1")
 public class CouponRecordController {
 
     @Autowired

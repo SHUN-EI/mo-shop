@@ -27,10 +27,10 @@
         values
         <foreach collection="couponTaskList" item="item" index="index" separator=",">
             (
-            #{item.couponRecordId}
-            #{item.outTradeNo}
-            #{item.lockState}
-            #{item.createTime}
+            #{item.couponRecordId},
+            #{item.outTradeNo},
+            #{item.lockState},
+            #{item.createTime},
             #{item.updateTime}
             )
         </foreach>

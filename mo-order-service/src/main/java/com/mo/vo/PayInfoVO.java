@@ -13,8 +13,6 @@ import java.math.BigDecimal;
  */
 @Builder
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class PayInfoVO {
 
     /**
@@ -54,6 +52,5 @@ public class PayInfoVO {
     /**
      * 订单支付超时时间，毫秒
      */
-    @JsonProperty("order_pay_timeoutMills")
     private Long orderPayTimeoutMills;
 }

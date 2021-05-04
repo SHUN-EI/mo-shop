@@ -27,7 +27,7 @@
     </sql>
 
     <!--批量插入订单详情对象-->
-    <insert id="insertBatch">
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
         insert into mp_order_detail (<include refid="Base_Column_List_No_Id"/>)
         values
         <foreach collection="orderDetailList" item="item" index="index" separator=",">
@@ -41,7 +41,7 @@
             #{item.amount},
             #{item.totalAmount},
             #{item.createTime},
-            #{item.updateTime},
+            #{item.updateTime}
             )
         </foreach>
     </insert>

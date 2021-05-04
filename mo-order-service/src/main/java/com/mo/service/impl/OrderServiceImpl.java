@@ -9,7 +9,7 @@ import com.mo.constant.TimeConstant;
 import com.mo.enums.*;
 import com.mo.exception.BizException;
 import com.mo.feign.CartFeignService;
-import com.mo.feign.CouponFeignService;
+import com.mo.feign.CouponRecordFeignService;
 import com.mo.feign.ProductFeignService;
 import com.mo.feign.UserFeignService;
 import com.mo.interceptor.LoginInterceptor;
@@ -28,12 +28,13 @@ import com.mo.vo.AddressVO;
 import com.mo.vo.CartItemVO;
 import com.mo.vo.CouponRecordVO;
 import com.mo.vo.PayInfoVO;
-import com.mysql.cj.log.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartFeignService cartFeignService;
     @Autowired
-    private CouponFeignService couponFeignService;
+    private CouponRecordFeignService couponRecordFeignService;
     @Autowired
     private ProductFeignService productFeignService;
     @Autowired
@@ -75,6 +76,13 @@ public class OrderServiceImpl implements OrderService {
 
     private static final String TRADE_FINISHED = "TRADE_FINISHED";
 
+    /**
+     * 下单
+     *
+     * @param request
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public JsonData createOrder(CreateOrderRequest request) {
 
@@ -93,9 +101,13 @@ public class OrderServiceImpl implements OrderService {
         List<CartItemVO> cartItemVOList = cartItemData.getData(new TypeReference<>() {
         });
         log.info("获取对应订单购物车里面的商品信息:{}", cartItemVOList);
+
         if (null == cartItemVOList) {
             throw new BizException(BizCodeEnum.ORDER_CONFIRM_CART_ITEM_NOT_EXIST);
         }
+
+        //锁定购物车商品项目,用于订单创建失败，恢复购物车商品项目
+        lockCartItems(loginUserDTO.getId(), cartItemVOList, outTradeNo);
 
         //订单验证价格，后端需要计算校验订单价格，不能单以前端为准
         checkPrice(cartItemVOList, request);
@@ -105,9 +117,6 @@ public class OrderServiceImpl implements OrderService {
 
         //锁定商品库存
         lockProducts(cartItemVOList, outTradeNo);
-
-        //锁定购物车商品项目,用于订单创建失败，恢复购物车商品项目
-        lockCartItems(loginUserDTO.getId(), cartItemVOList, outTradeNo);
 
         //创建订单对象
         MpOrderDO orderDO = saveOrder(request, loginUserDTO, outTradeNo, addressVO);
@@ -124,7 +133,7 @@ public class OrderServiceImpl implements OrderService {
                 .payType(request.getPayType())
                 .totalAmount(request.getTotalAmount())
                 .clientType(request.getClientType())
-                .title("订单号:" + outTradeNo + cartItemVOList.get(0).getProductTitle())
+                .title(cartItemVOList.get(0).getProductTitle())
                 .description(outTradeNo)
                 .orderPayTimeoutMills(TimeConstant.ORDER_PAY_TIMEOUT_MILLS)
                 .build();
@@ -246,7 +255,6 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList());
 
         orderDetailMapper.insertBatch(orderDetailDOList);
-
     }
 
     /**
@@ -349,7 +357,7 @@ public class OrderServiceImpl implements OrderService {
             lockCouponRecordRequest.setLockCouponRecordIds(lockCouponRecordIds);
 
             //发送优惠券锁定请求
-            JsonData jsonData = couponFeignService.lockCouponRecords(lockCouponRecordRequest);
+            JsonData jsonData = couponRecordFeignService.lockCouponRecords(lockCouponRecordRequest);
             if (jsonData.getCode() != 0) {
                 log.error("锁定优惠券失败:{}", lockCouponRecordRequest);
                 throw new BizException(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
@@ -366,13 +374,10 @@ public class OrderServiceImpl implements OrderService {
      */
     private void checkPrice(List<CartItemVO> cartItemVOList, CreateOrderRequest request) {
 
-        BigDecimal finalAmount = new BigDecimal("0");
+        BigDecimal finalAmount = BigDecimal.ZERO;
         //统计全部商品的价格
         if (null != cartItemVOList) {
-            for (CartItemVO cartItemVO : cartItemVOList) {
-                BigDecimal itemTotalAmount = cartItemVO.getTotalAmount();
-                finalAmount = finalAmount.add(itemTotalAmount);
-            }
+            finalAmount = cartItemVOList.stream().map(CartItemVO::getTotalAmount).reduce(finalAmount, BigDecimal::add);
         }
 
         //获取优惠券(判断是否满足优惠券的使用条件)
@@ -395,8 +400,8 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        //后台计算的总价格与前端传过来的总价格比较，若不相等，则验价失败，不能创建订单
-        if (finalAmount.compareTo(request.getTotalAmount()) != 0) {
+        //后台计算的实际支付价格与前端传过来的实际支付价格比较，若不相等，则验价失败，不能创建订单
+        if (finalAmount.compareTo(request.getActualAmount()) != 0) {
             log.error("订单验价失败:{}", request);
             throw new BizException(BizCodeEnum.ORDER_CONFIRM_PRICE_FAIL);
         }
@@ -415,7 +420,7 @@ public class OrderServiceImpl implements OrderService {
             return null;
         }
 
-        JsonData couponRecordData = couponFeignService.findUserCouponRecord(couponRecordId);
+        JsonData couponRecordData = couponRecordFeignService.findUserCouponRecord(couponRecordId);
         if (couponRecordData.getCode() != 0) {
             throw new BizException(BizCodeEnum.ORDER_CONFIRM_COUPON_FAIL);
         }

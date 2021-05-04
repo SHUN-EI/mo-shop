@@ -48,11 +48,13 @@ public class PayController {
 
 
     /**
+     * 支付宝支付回调通知，post方式
+     *
      * @param request
      * @param response
      * @return
      */
-    @ApiOperation("")
+    @ApiOperation("支付宝支付回调")
     @PostMapping("/callback/alipay")
     public String alipayCallback(HttpServletRequest request, HttpServletResponse response) {
 
@@ -90,7 +92,7 @@ public class PayController {
         content.put("out_trade_no", outTradeNo);
         content.put("product_code", "FAST_INSTANT_TRADE_PAY");
         //订单总金额，单位为元，精确到小数点后两位
-        content.put("total_amount", String.valueOf("111.99"));
+        content.put("total_amount", String.valueOf("10.00"));
         //商品标题/交易标题/订单标题/订单关键字等。 注意：不可使用特殊字符，如 /，=，&amp; 等。
         content.put("subject", "杯子");
         //商品描述，可空

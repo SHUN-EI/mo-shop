@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="moshop_user@192.168.151.99" uuid="c5cc639c-9e0b-4a45-952f-c63f67a108e7">
-      <driver-ref>mysql.8</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://192.168.151.99:3306/moshop_user</jdbc-url>
-    </data-source>
     <data-source source="LOCAL" name="moshop_user@ali-test" uuid="459c8655-4357-457d-a94f-3313cb737ea3">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
@@ -18,12 +12,6 @@
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://39.108.182.26:3306/moshop_coupon</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="moshop_coupon@192.168.151.99" uuid="e090708f-46b9-46aa-b520-99f83707e1bc">
-      <driver-ref>mysql.8</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://192.168.151.99:3306/moshop_coupon</jdbc-url>
     </data-source>
     <data-source source="LOCAL" name="moshop_product@ali-test" uuid="a7c8db7f-9ad7-4d6b-b38d-caacee386df5">
       <driver-ref>mysql.8</driver-ref>
