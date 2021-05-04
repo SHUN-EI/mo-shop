@@ -52,5 +52,5 @@ mqconfig:
   product_release_delay_routing_key: product.release.delay.routing.key
   #消息过期，进入释放死信队列的key
   product_release_routing_key: product.release.routing.key
-  #消息过期时间,毫秒,测试改为15秒
-  ttl: 15000
+  #消息过期时间,毫秒,测试改为15秒-15000
+  ttl: 360000 # 锁定商品的时间为6分钟

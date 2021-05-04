@@ -52,8 +52,8 @@ mqconfig:
   order_close_delay_routing_key: order.close.delay.routing.key
   #消息过期，进入释放死信队列的key
   order_close_routing_key: order.close.routing.key
-  #消息过期时间,毫秒,测试改为15秒
-  ttl: 15000
+  #消息过期时间,毫秒,测试改为15秒-15000
+  ttl: 300000 # 订单5分钟超时未支付则关闭
 #支付宝配置
 alipay:
   #支付成功的跳转页面

@@ -52,5 +52,5 @@ mqconfig:
   cart_release_delay_routing_key: cart.release.delay.routing.key
   #消息过期，进入释放死信队列的key
   cart_release_routing_key: cart.release.routing.key
-  #消息过期时间,毫秒,测试改为15秒
-  ttl: 15000
+  #消息过期时间,毫秒,测试改为15秒-15000
+  ttl: 360000 # 锁定购物车商品项目的时间为6分钟

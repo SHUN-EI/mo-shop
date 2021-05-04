@@ -2,6 +2,7 @@ package com.mo.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,7 +38,6 @@ public class CartVO {
     @JsonProperty("actual_amount")
     private BigDecimal actualAmount;
 
-
     /**
      * 购物项目总数量 =购物项目各数量之和
      *
@@ -59,11 +59,11 @@ public class CartVO {
      * @return
      */
     public BigDecimal getTotalAmount() {
-        BigDecimal amount = new BigDecimal(0);
+        BigDecimal amount = BigDecimal.ZERO;
         if (this.cartItems != null) {
-            cartItems.forEach(obj -> amount.add(obj.getTotalAmount()));
+            amount = cartItems.stream().map(CartItemVO::getTotalAmount).reduce(amount, BigDecimal::add);
         }
-        return totalAmount;
+        return amount;
     }
 
     /**
@@ -73,10 +73,10 @@ public class CartVO {
      * @return
      */
     public BigDecimal getActualAmount() {
-        BigDecimal amount = new BigDecimal(0);
+        BigDecimal amount = BigDecimal.ZERO;
         if (this.cartItems != null) {
-            cartItems.forEach(obj -> amount.add(obj.getTotalAmount()));
+            amount = cartItems.stream().map(CartItemVO::getTotalAmount).reduce(amount, BigDecimal::add);
         }
-        return actualAmount;
+        return amount;
     }
 }
