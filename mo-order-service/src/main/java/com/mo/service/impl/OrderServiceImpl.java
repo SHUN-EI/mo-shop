@@ -36,6 +36,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +65,10 @@ public class OrderServiceImpl implements OrderService {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
+
+    private static final String TRADE_SUCCESS = "TRADE_SUCCESS";
+
+    private static final String TRADE_FINISHED = "TRADE_FINISHED";
 
     @Override
     public JsonData createOrder(CreateOrderRequest request) {
@@ -111,6 +116,32 @@ public class OrderServiceImpl implements OrderService {
         //创建支付信息-对接第三方支付
 
         return null;
+    }
+
+    /**
+     * 支付结果回调通知
+     *
+     * @param payType
+     * @param paramsMap
+     * @return
+     */
+    @Override
+    public JsonData handlerOrderCallbackMsg(OrderPayTypeEnum payType, Map<String, String> paramsMap) {
+        if (payType.name().equalsIgnoreCase(OrderPayTypeEnum.ALIPAY.name())) {
+            //支付宝支付,获取订单号和交易状态
+            String outTradeNo = paramsMap.get("out_trade_no");
+            String tradeStatus = paramsMap.get("trade_status");
+
+            if (TRADE_SUCCESS.equalsIgnoreCase(tradeStatus) || TRADE_FINISHED.equalsIgnoreCase(tradeStatus)) {
+                //更新订单状态
+                orderMapper.updateOrderState(outTradeNo, OrderStateEnum.PAY.name(), OrderStateEnum.NEW.name());
+                return JsonData.buildSuccess();
+            }
+        } else if (payType.name().equalsIgnoreCase(OrderPayTypeEnum.WECHAT.name())) {
+            //微信支付
+
+        }
+        return JsonData.buildResult(BizCodeEnum.PAY_ORDER_CALLBACK_SIGN_FAIL);
     }
 
     /**

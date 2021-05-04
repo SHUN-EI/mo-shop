@@ -9,15 +9,37 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
-import java.util.Random;
-import java.util.TooManyListenersException;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by mo on 2021/4/20
  */
 @Slf4j
 public class CommonUtil {
+
+    /**
+     * 将request中的参数转换成Map
+     *
+     * @param request
+     * @return
+     */
+    public static Map<String, String> convertRequestParamsToMap(HttpServletRequest request) {
+        Map<String, String> paramsMap = new HashMap<>(16);
+        Set<Map.Entry<String, String[]>> entrySet = request.getParameterMap().entrySet();
+
+        for (Map.Entry<String, String[]> entry : entrySet) {
+            String name = entry.getKey();
+            String[] values = entry.getValue();
+            int size = values.length;
+            if (size == 1) {
+                paramsMap.put(name, values[0]);
+            } else {
+                paramsMap.put(name, "");
+            }
+        }
+        System.out.println(paramsMap);
+        return paramsMap;
+    }
 
     /**
      * 获取ip

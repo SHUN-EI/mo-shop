@@ -58,5 +58,5 @@ mqconfig:
 alipay:
   #支付成功的跳转页面
   success_return_url: https://xdclass.net
-  #支付宝通知回调接口
-  callback_url: https://xdclass.net
+  #支付宝通知回调接口，蚂蚁金服开放平台应用后台也需要配置这个地址
+  callback_url: http://moshop.ngrok2.xiaomiqiu.cn/api/pay/v1/callback/alipay

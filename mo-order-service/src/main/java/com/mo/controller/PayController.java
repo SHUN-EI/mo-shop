@@ -2,19 +2,28 @@ package com.mo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.mo.config.AlipayConfig;
 import com.mo.config.PayUrlConfig;
 import com.mo.enums.OrderCodeEnum;
+import com.mo.enums.OrderPayTypeEnum;
+import com.mo.service.OrderService;
+import com.mo.utils.CommonUtil;
+import com.mo.utils.JsonData;
 import com.mo.utils.OrderCodeGenerateUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.spring.web.json.Json;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,6 +33,7 @@ import java.util.Map;
 /**
  * Created by mo on 2021/5/3
  */
+@Api(tags = "支付模块")
 @RequestMapping("/api/pay/v1")
 @RestController
 @Slf4j
@@ -33,6 +43,41 @@ public class PayController {
     private OrderCodeGenerateUtil orderCodeGenerateUtil;
     @Autowired
     private PayUrlConfig payUrlConfig;
+    @Autowired
+    private OrderService orderService;
+
+
+    /**
+     * @param request
+     * @param response
+     * @return
+     */
+    @ApiOperation("")
+    @PostMapping("/callback/alipay")
+    public String alipayCallback(HttpServletRequest request, HttpServletResponse response) {
+
+        //将异步通知中收到的所有参数存储在map中
+        Map<String, String> paramsMap = CommonUtil.convertRequestParamsToMap(request);
+        log.info("支付宝回调通知结果:{}", paramsMap);
+
+        //调用支付宝SDK验证签名
+        try {
+            boolean signVerified = AlipaySignature.rsaCheckV1(paramsMap, AlipayConfig.ALIPAY_PUBLIC_KEY, AlipayConfig.CHARSET, AlipayConfig.SIGN_TYPE);
+            if (signVerified) {
+                JsonData jsonData = orderService.handlerOrderCallbackMsg(OrderPayTypeEnum.ALIPAY, paramsMap);
+                if (jsonData.getCode() == 0) {
+                    //支付宝通知结果确认成功，不然会一直通知，有8次重试次数，超过8次就认为支付失败
+                    return "success";
+                }
+            }
+
+        } catch (AlipayApiException e) {
+            log.info("支付宝回调验证签名异常:{}，参数:{}", e, paramsMap);
+        }
+
+        return "failure";
+    }
+
 
     @GetMapping("/testPay")
     public void testAliPay(HttpServletResponse response) {

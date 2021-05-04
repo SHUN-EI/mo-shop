@@ -31,8 +31,6 @@ public interface PayStrategy {
      * @param payInfoVO
      * @return
      */
-    default String queryPaySuccess(PayInfoVO payInfoVO) {
-        return "";
-    }
+    String queryPaySuccess(PayInfoVO payInfoVO);
 
 }
