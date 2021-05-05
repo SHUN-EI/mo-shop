@@ -9,18 +9,18 @@ import com.mo.config.AlipayConfig;
 import com.mo.config.PayUrlConfig;
 import com.mo.enums.OrderCodeEnum;
 import com.mo.enums.OrderPayTypeEnum;
+import com.mo.request.RepayOrderRequest;
 import com.mo.service.OrderService;
 import com.mo.utils.CommonUtil;
+import com.mo.utils.HttpUtil;
 import com.mo.utils.JsonData;
 import com.mo.utils.OrderCodeGenerateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +46,25 @@ public class PayController {
     @Autowired
     private OrderService orderService;
 
+    /**
+     * 订单重新支付
+     *
+     * @param request
+     */
+    @ApiOperation("重新支付订单")
+    @PostMapping("/repay")
+    public void repay(@ApiParam("订单二次支付对象") @RequestBody RepayOrderRequest request, HttpServletResponse response) {
+
+        JsonData jsonData = orderService.repay(request);
+
+        if (jsonData.getCode() == 0) {
+            log.info("重新支付订单成功:{}", jsonData.getData());
+            HttpUtil.writeData(response, jsonData);
+        } else {
+            log.error("重新支付订单失败:{}", jsonData.toString());
+            CommonUtil.sendJsonMessage(response, jsonData);
+        }
+    }
 
     /**
      * 支付宝支付回调通知，post方式

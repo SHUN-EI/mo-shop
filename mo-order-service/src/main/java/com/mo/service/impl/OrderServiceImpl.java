@@ -74,6 +74,75 @@ public class OrderServiceImpl implements OrderService {
     private static final String TRADE_FINISHED = "TRADE_FINISHED";
 
     /**
+     * 重新支付订单
+     *
+     * @param request
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public JsonData repay(RepayOrderRequest request) {
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        MpOrderDO orderDO = orderMapper.selectOne(new QueryWrapper<MpOrderDO>().eq("out_trade_no", request.getOutTradeNo())
+                .eq("user_id", loginUserDTO.getId()));
+
+        log.info("订单记录为:{}", orderDO);
+
+        if (null == orderDO) {
+            return JsonData.buildResult(BizCodeEnum.PAY_ORDER_NOT_EXIST);
+        }
+
+        //NEW 状态的订单才可以重新支付
+        if (OrderStateEnum.NEW.name().equalsIgnoreCase(orderDO.getState())) {
+            //订单创建到现在的存活时间
+            long orderLiveTime = CommonUtil.getCurrentTimestamp() - orderDO.getCreateTime().getTime();
+            //创建订单是临界点，所以再增加1分钟多几秒，假如30分钟支付时间，现在是29分，则也不能支付了
+            orderLiveTime = orderLiveTime + 70 * 1000;
+
+            //大于订单超时时间，则失效
+            if (orderLiveTime > TimeConstant.ORDER_PAY_TIMEOUT_MILLS) {
+                return JsonData.buildResult(BizCodeEnum.PAY_ORDER_PAY_TIMEOUT);
+            } else {
+                //总时间-存活的时间 = 剩下的有效时间
+                long timeout = TimeConstant.ORDER_PAY_TIMEOUT_MILLS - orderLiveTime;
+                //创建支付信息-对接第三方支付
+                PayInfoVO payInfoVO = PayInfoVO.builder()
+                        .outTradeNo(request.getOutTradeNo())
+                        .payType(request.getPayType())
+                        .totalAmount(orderDO.getTotalAmount())
+                        .clientType(request.getClientType())
+                        .title(request.getOutTradeNo())
+                        .description(request.getOutTradeNo())
+                        .orderPayTimeoutMills(timeout)
+                        .build();
+
+                log.info("支付信息:payInfoVO={} ", payInfoVO);
+
+                String payResult = payFactory.pay(payInfoVO);
+                log.info("支付结果:payResult={} ", payResult);
+                if (StringUtils.isNotBlank(payResult)) {
+                    log.info("创建二次支付订单成功:payInfoVO={},payResult={}", payInfoVO, payResult);
+
+                    //更新订单支付状态，还可以增加订单支付信息日志
+                    orderDO.setState(OrderStateEnum.PAY.name());
+                    orderDO.setPayType(request.getPayType());
+                    orderMapper.update(orderDO, new QueryWrapper<MpOrderDO>().eq("out_trade_no", orderDO.getOutTradeNo()));
+
+                    return JsonData.buildSuccess(payResult);
+                } else {
+                    log.error("创建二次支付订单失败: payInfoVO={},payResult={}", payInfoVO, payResult);
+                    return JsonData.buildResult(BizCodeEnum.PAY_ORDER_FAIL);
+                }
+            }
+
+        } else {
+            return JsonData.buildResult(BizCodeEnum.PAY_ORDER_STATE_ERROR);
+        }
+
+    }
+
+    /**
      * 分页查询订单列表
      *
      * @param request

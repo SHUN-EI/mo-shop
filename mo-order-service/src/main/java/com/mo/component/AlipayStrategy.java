@@ -93,6 +93,7 @@ public class AlipayStrategy implements PayStrategy {
 
                 log.info("响应日志:aliPayResponse={}", aliPayResponse);
                 if (aliPayResponse.isSuccess()) {
+                    log.info("创建支付宝订单成功:{},aliPayResponse={},payInfo={}", aliPayResponse, payInfoVO);
                     formData = aliPayResponse.getBody();
                 } else {
                     log.error("支付宝构建PC表单失败:aliPayResponse={},payInfo={}", aliPayResponse, payInfoVO);

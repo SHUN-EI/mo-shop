@@ -95,6 +95,7 @@ public class CouponRecordServiceImpl implements CouponRecordService {
                 //若订单状态为PAY-已经支付订单,需要修改优惠券库存锁定任务的记录Task的状态为FINISH
                 if (OrderStateEnum.PAY.name().equalsIgnoreCase(state)) {
                     couponTaskDO.setLockState(LockStateEnum.FINISH.name());
+                    couponTaskDO.setUpdateTime(new Date());
                     couponTaskMapper.update(couponTaskDO, new QueryWrapper<CouponTaskDO>().eq("id", recordMessage.getCouponTaskId()));
                     log.info("订单已经支付，修改优惠券库存锁定记录状态为FINISH:{}", recordMessage);
                     return true;//消息消费
@@ -108,6 +109,7 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
             //修改优惠券库存锁定任务的锁定状态为 CANCEL
             couponTaskDO.setLockState(LockStateEnum.CANCEL.name());
+            couponTaskDO.setUpdateTime(new Date());
             couponTaskMapper.update(couponTaskDO, new QueryWrapper<CouponTaskDO>().eq("id", recordMessage.getCouponTaskId()));
 
             return true;//消息消费

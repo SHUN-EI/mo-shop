@@ -7,6 +7,8 @@ import com.mo.model.MpOrderDO;
 import com.mo.request.CreateOrderRequest;
 import com.mo.request.OrderListRequest;
 import com.mo.service.OrderService;
+import com.mo.utils.CommonUtil;
+import com.mo.utils.HttpUtil;
 import com.mo.utils.JsonData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -72,33 +74,12 @@ public class OrderController {
 
         JsonData jsonData = orderService.createOrder(request);
         if (jsonData.getCode() == 0) {
-
-            String clientType = request.getClientType();
-            String payType = request.getPayType();
-
-            //若是支付宝网页支付，都是跳转网页，app除外
-            if (payType.equalsIgnoreCase(OrderPayTypeEnum.ALIPAY.name())) {
-
-                log.info("创建支付宝订单成功:{}", request.toString());
-                writeData(response, jsonData);
-            }
-
+            log.info("创建订单成功:{}", jsonData.getData());
+            HttpUtil.writeData(response, jsonData);
         } else {
-            log.error("创建订单失败{}", jsonData.getData());
+            log.error("创建订单失败:{}", jsonData.getData());
+            CommonUtil.sendJsonMessage(response, jsonData);
         }
-
-    }
-
-    private void writeData(HttpServletResponse response, JsonData jsonData) {
-        try (PrintWriter writer = response.getWriter()) {
-
-            response.setContentType("text/html;charset=utf-8");
-            writer.write(jsonData.getData().toString());
-            response.flushBuffer();
-        } catch (IOException e) {
-            log.error("写出响应页面异常:{}", e);
-        }
-
     }
 }
 

@@ -93,6 +93,7 @@ public class CartServiceImpl implements CartService {
 
             //修改购物车商品锁定任务状态为 CANCEL
             cartTaskDO.setLockState(LockStateEnum.CANCEL.name());
+            cartTaskDO.setUpdateTime(new Date());
             cartTaskMapper.update(cartTaskDO, new QueryWrapper<CartTaskDO>().eq("id", cartTaskDO.getId()));
             return true;//消息消费
         }

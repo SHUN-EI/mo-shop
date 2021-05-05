@@ -91,6 +91,7 @@ public class ProductServiceImpl implements ProductService {
                 //若订单状态为PAY-已经支付订单,需要修改商品库存锁定任务的记录Task的状态为FINISH
                 if (OrderStateEnum.PAY.name().equalsIgnoreCase(state)) {
                     productTaskDO.setLockState(LockStateEnum.FINISH.name());
+                    productTaskDO.setUpdateTime(new Date());
                     productTaskMapper.update(productTaskDO, new QueryWrapper<ProductTaskDO>().eq("id", productMessage.getProductTaskId()));
                     log.info("订单已经支付，修改商品库存锁定记录状态为FINISH:{}", productMessage);
                     return true;//消息消费
@@ -104,6 +105,7 @@ public class ProductServiceImpl implements ProductService {
 
             //修改商品库存锁定任务的锁定状态为 CANCEL
             productTaskDO.setLockState(LockStateEnum.CANCEL.name());
+            productTaskDO.setUpdateTime(new Date());
             productTaskMapper.update(productTaskDO, new QueryWrapper<ProductTaskDO>().eq("id", productMessage.getProductTaskId()));
 
             return true;//消息消费
