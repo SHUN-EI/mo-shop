@@ -1,8 +1,11 @@
 package com.mo.controller;
 
 
+import com.mo.constant.CacheKey;
 import com.mo.enums.BizCodeEnum;
 import com.mo.enums.OrderPayTypeEnum;
+import com.mo.interceptor.LoginInterceptor;
+import com.mo.model.LoginUserDTO;
 import com.mo.model.MpOrderDO;
 import com.mo.request.CreateOrderRequest;
 import com.mo.request.OrderListRequest;
@@ -16,12 +19,15 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mo
@@ -35,6 +41,25 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    /**
+     * 获取提交订单令牌
+     *
+     * @return
+     */
+    @ApiOperation("获取提交订单令牌")
+    @GetMapping("/getOrderToken")
+    public JsonData getOrderToken() {
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+        String key = String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY, loginUserDTO.getId());
+        String token = CommonUtil.getStringNumRandom(32);
+
+        redisTemplate.opsForValue().set(key, token, 30, TimeUnit.MINUTES);
+
+        return JsonData.buildSuccess(token);
+    }
 
     /**
      * 分页查询订单列表

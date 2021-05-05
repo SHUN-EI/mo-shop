@@ -19,4 +19,10 @@ public class CacheKey {
      * 订单-流水号缓存key前缀
      */
     public static final String ORDER_CODE_CACHE_PREFIX_KEY = "ORDER_CODE_CACHE:";
+
+
+    /**
+     * 订单提交的token key
+     */
+    public static final String SUBMIT_ORDER_TOKEN_KEY = "order:submit:%s";
 }

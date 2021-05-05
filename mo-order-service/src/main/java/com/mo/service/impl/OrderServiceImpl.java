@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.component.PayFactory;
 import com.mo.config.RabbitMQConfig;
+import com.mo.constant.CacheKey;
 import com.mo.constant.TimeConstant;
 import com.mo.enums.*;
 import com.mo.exception.BizException;
@@ -32,6 +33,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +72,8 @@ public class OrderServiceImpl implements OrderService {
     private RabbitMQConfig rabbitMQConfig;
     @Autowired
     private PayFactory payFactory;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     private static final String TRADE_SUCCESS = "TRADE_SUCCESS";
 
@@ -201,9 +207,24 @@ public class OrderServiceImpl implements OrderService {
     public JsonData createOrder(CreateOrderRequest request) {
 
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        //防重提交
+        String orderToken = request.getToken();
+        if (StringUtils.isBlank(orderToken)) {
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_TOKEN_NOT_EXIST);
+        }
+
+        //lua脚本-原子操作 校验令牌，删除令牌
+        String script = "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+
+        Long result = redisTemplate.execute(new DefaultRedisScript<>(script,Long.class),
+                Arrays.asList(String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY,loginUserDTO.getId())),orderToken);
+        if(result == 0L){
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_TOKEN_EQUAL_FAIL);
+        }
+
         //生成订单号
         String outTradeNo = orderCodeGenerateUtil.generateOrderCode(OrderCodeEnum.XD);
-        //防重提交
 
         //用户微服务-确认收货地址，防止越权
         AddressVO addressVO = getUserAddress(request.getAddressId());
