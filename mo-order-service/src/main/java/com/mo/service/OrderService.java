@@ -5,6 +5,7 @@ import com.mo.model.MpOrderDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mo.model.OrderMessage;
 import com.mo.request.CreateOrderRequest;
+import com.mo.request.OrderListRequest;
 import com.mo.utils.JsonData;
 
 import java.util.Map;
@@ -22,4 +23,6 @@ public interface OrderService {
     boolean closeOrder(OrderMessage orderMessage);
 
     JsonData handlerOrderCallbackMsg(OrderPayTypeEnum payType, Map<String, String> paramsMap);
+
+    Map<String, Object> pageOrderList(OrderListRequest request);
 }

@@ -5,6 +5,7 @@ import com.mo.enums.BizCodeEnum;
 import com.mo.enums.OrderPayTypeEnum;
 import com.mo.model.MpOrderDO;
 import com.mo.request.CreateOrderRequest;
+import com.mo.request.OrderListRequest;
 import com.mo.service.OrderService;
 import com.mo.utils.JsonData;
 import io.swagger.annotations.Api;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 /**
  * @author mo
@@ -31,6 +33,21 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    /**
+     * 分页查询订单列表
+     *
+     * @param request
+     * @return
+     */
+    @ApiOperation("分页查询订单列表")
+    @PostMapping("/pageOrderList")
+    public JsonData pageOrderList(@ApiParam("订单列表对象") @RequestBody OrderListRequest request) {
+
+        Map<String, Object> pageResult = orderService.pageOrderList(request);
+
+        return JsonData.buildSuccess(pageResult);
+    }
 
     /**
      * 查询订单状态

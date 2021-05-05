@@ -3,6 +3,8 @@ package com.mo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.component.PayFactory;
 import com.mo.config.RabbitMQConfig;
 import com.mo.constant.TimeConstant;
@@ -24,23 +26,18 @@ import com.mo.service.OrderService;
 import com.mo.utils.CommonUtil;
 import com.mo.utils.JsonData;
 import com.mo.utils.OrderCodeGenerateUtil;
-import com.mo.vo.AddressVO;
-import com.mo.vo.CartItemVO;
-import com.mo.vo.CouponRecordVO;
-import com.mo.vo.PayInfoVO;
+import com.mo.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +72,54 @@ public class OrderServiceImpl implements OrderService {
     private static final String TRADE_SUCCESS = "TRADE_SUCCESS";
 
     private static final String TRADE_FINISHED = "TRADE_FINISHED";
+
+    /**
+     * 分页查询订单列表
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public Map<String, Object> pageOrderList(OrderListRequest request) {
+
+        LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
+
+        Page<MpOrderDO> pageInfo = new Page<>(request.getPage(), request.getSize());
+        IPage<MpOrderDO> orderDOPage = null;
+
+        if (null == request.getOrderState()) {
+            orderDOPage = orderMapper.selectPage(pageInfo, new QueryWrapper<MpOrderDO>().eq("user_id", loginUserDTO.getId()));
+        } else {
+            orderDOPage = orderMapper.selectPage(pageInfo, new QueryWrapper<MpOrderDO>().eq("user_id", loginUserDTO.getId())
+                    .eq("state", request.getOrderState()));
+        }
+
+        //获取订单列表
+        List<MpOrderDO> orderDOList = orderDOPage.getRecords();
+        List<OrderVO> orderVOList = orderDOList.stream().map(obj -> {
+            //获取订单详情
+            List<MpOrderDetailDO> orderDetailDOList = orderDetailMapper.selectList(new QueryWrapper<MpOrderDetailDO>().eq("order_id", obj.getId()));
+
+            List<CartItemVO> cartItemVOList = orderDetailDOList.stream().map(item -> {
+                CartItemVO cartItemVO = new CartItemVO();
+                BeanUtils.copyProperties(item, cartItemVO);
+                return cartItemVO;
+            }).collect(Collectors.toList());
+
+            OrderVO orderVO = new OrderVO();
+            BeanUtils.copyProperties(obj, orderVO);
+            orderVO.setCartItemVOList(cartItemVOList);
+            return orderVO;
+
+        }).collect(Collectors.toList());
+
+        Map<String, Object> pageMap = new HashMap<>();
+        pageMap.put("total_record", orderDOPage.getTotal());
+        pageMap.put("total_page", orderDOPage.getPages());
+        pageMap.put("current_data", orderVOList);
+
+        return pageMap;
+    }
 
     /**
      * 下单
@@ -138,7 +183,10 @@ public class OrderServiceImpl implements OrderService {
                 .orderPayTimeoutMills(TimeConstant.ORDER_PAY_TIMEOUT_MILLS)
                 .build();
 
+        log.info("支付信息:payInfoVO={} ", payInfoVO);
+
         String payResult = payFactory.pay(payInfoVO);
+        log.info("支付结果:payResult={} ", payResult);
         if (StringUtils.isNotBlank(payResult)) {
             return JsonData.buildSuccess(payResult);
         } else {
