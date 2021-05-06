@@ -130,6 +130,12 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
+        <!--sentinel限流依赖-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+
         <!--alibaba微服务整合分布式事务seata，因为seata服务端我们使用的是1.3.0,所以我们客户端这里也要使用相同的版本-->
 <!--        <dependency>-->
 <!--            <groupId>com.alibaba.cloud</groupId>-->
