@@ -40,6 +40,8 @@ mybatis-plus:
 logging:
   level:
     root: INFO
+    #nacos日志问题
+    com.alibaba.nacos.client.config.impl: WARN
 #阿里云OSS配置
 aliyun:
   oss:

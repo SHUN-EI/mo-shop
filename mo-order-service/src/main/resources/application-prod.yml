@@ -40,6 +40,8 @@ mybatis-plus:
 logging:
   level:
     root: INFO
+    #nacos日志问题
+    com.alibaba.nacos.client.config.impl: WARN
 #自定义消息队列配置，发送锁定库存消息-》延迟exchange-》lock.queue-》死信exchange-》release.queue
 mqconfig:
   #延迟队列，不能被监听消费
@@ -59,4 +61,6 @@ alipay:
   #支付成功的跳转页面
   success_return_url: https://xdclass.net
   #支付宝通知回调接口，蚂蚁金服开放平台应用后台也需要配置这个地址
-  callback_url: http://moshop.ngrok2.xiaomiqiu.cn/api/pay/v1/callback/alipay
+  #callback_url: http://moshop.ngrok2.xiaomiqiu.cn/api/pay/v1/callback/alipay
+  #引入gateway后需要转发到网关地址
+  callback_url: http://moshop.ngrok2.xiaomiqiu.cn/order-server/api/pay/v1/callback/alipay
