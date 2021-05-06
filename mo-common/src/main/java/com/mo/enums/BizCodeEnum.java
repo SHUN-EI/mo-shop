@@ -86,6 +86,14 @@ public enum BizCodeEnum {
     PAY_ORDER_PAY_TIMEOUT(300007,"订单支付超时"),
 
     /**
+     * 流控操作
+     */
+    CONTROL_FLOW(500101,"限流控制"),
+    CONTROL_DEGRADE(500201,"降级控制"),
+    CONTROL_AUTH(500301,"认证控制"),
+
+
+    /**
      * 文件相关
      */
     FILE_UPLOAD_USER_IMG_FAILED(600001, "用户头像文件上传失败");

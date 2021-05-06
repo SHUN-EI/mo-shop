@@ -11,6 +11,15 @@ spring:
       transport:
         dashboard: 39.108.182.26:8858 #dashboard: 8858 控制台端口
         port: 9999
+      #流控规则持久化到nacos配置中心
+      datasource:
+        ds1: #自定义id
+          nacos:
+            server-addr: 39.108.182.26:8848
+            data-id: ${spring.application.name}-${spring.profiles.active}.json
+            group-id: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow
   datasource: #数据库配置
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://39.108.182.26:3306/moshop_product?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
