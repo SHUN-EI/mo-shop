@@ -28,7 +28,7 @@ spring:
   redis:   #Redis
     host: 39.108.182.26
     port: 8000
-    password: 123456
+    password: mo12345
   rabbitmq:   #消息队列
     host: 39.108.182.26
     port: 5672
