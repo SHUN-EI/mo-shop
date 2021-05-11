@@ -1,6 +1,8 @@
 package com.mo.utils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +32,23 @@ public class DateUtil {
      */
     public static Long getMillis(TimeUnit timeUnit, int duration) {
         return timeUnit.toMillis(duration);
+    }
+
+    /**
+     * 根据当前日期格式化
+     *
+     * @param pattern
+     * @return
+     */
+    public static String getTime(String pattern) {
+
+        //获取当前时间，JDK8时间日期处理类
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        String format = formatter.format(now);
+
+        return format;
+
     }
 
 
