@@ -44,14 +44,15 @@ public class ProductMQListener {
     @RabbitHandler
     public void releaseProductStock(ProductMessage productMessage, Message message, Channel channel) throws IOException {
 
+        //防止同个商品库存解锁任务并发进入，如果是串行消费消息，则不用加锁，加锁有利有弊，要看具体项目业务逻辑而定
+        Lock lock = redissonClient.getLock("lock:product_stock_release" + productMessage.getProductTaskId());
+        lock.lock();
+
         log.info("监听到消息：releaseProductStock的消息内容:{}", productMessage);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
 
         boolean flag = productService.releaseProductStock(productMessage);
 
-        //防止同个商品库存解锁任务并发进入，如果是串行消费消息，则不用加锁，加锁有利有弊，要看具体项目业务逻辑而定
-        Lock lock = redissonClient.getLock("lock:product_stock_release" + productMessage.getProductTaskId());
-        lock.lock();
         try {
             if (flag) {
                 //确认消息消费成功
