@@ -3,6 +3,7 @@ package com.mo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mo.constant.CacheKey;
 import com.mo.enums.*;
 import com.mo.exception.BizException;
 import com.mo.interceptor.LoginInterceptor;
@@ -91,7 +92,11 @@ public class CouponServiceImpl implements CouponService {
 
         LoginUserDTO loginUserDTO = LoginInterceptor.threadLocal.get();
 
-        String lockKey = "lock:coupon:" + couponId;
+
+        //String lockKey = "lock:coupon:" + couponId;
+        //领券锁,防止单个用户对单个券超领
+        String lockKey = String.format(CacheKey.LOCK_COUPON_KEY, couponId, loginUserDTO.getId());
+
         RLock lock = redissonClient.getLock(lockKey);
         //阻塞式等待，一个线程获取锁后，其他线程只能等待，和原生的方式循环调用不一样
         //锁的过期时间默认为30s，有 watch dog功能
