@@ -22,6 +22,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -151,6 +152,7 @@ public class CouponServiceImpl implements CouponService {
      * @return
      */
     @Override
+    @Cacheable(value = {"coupon"},key = "#root.methodName + #page+'_'+#size")
     public Map<String, Object> pageCouponActivity(int page, int size) {
         //第1页，每页10条
         Page<MpCouponDO> pageInfo = new Page<>(page, size);
