@@ -119,7 +119,7 @@
             <version>${mysql-connector.version}</version>
         </dependency>
 
-        <!--接口文档依赖-->
+        <!--Swagger接口文档依赖-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>

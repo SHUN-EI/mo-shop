@@ -51,12 +51,12 @@ public class OrderMQListener {
             } else {
                 log.error("关闭订单失败 flag=false,{}", orderMessage);
                 //消息重新入队
-                channel.basicReject(deliveryTag, false);
+                channel.basicReject(deliveryTag, true);
             }
         } catch (IOException e) {
             log.error("关闭订单异常:{},msg:{}", e, orderMessage);
             //消息重新入队
-            channel.basicReject(deliveryTag, false);
+            channel.basicReject(deliveryTag, true);
         }
     }
 }
