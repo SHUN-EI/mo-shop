@@ -88,7 +88,7 @@ public class NotifyServiceImpl implements NotifyService {
         String cacheKey = String.format(CacheKey.CHECK_CODE_KEY, sendCodeEnum.name(), to);
 
         String cacheValue = redisTemplate.opsForValue().get(cacheKey);
-        if (StringUtils.isNoneBlank(cacheKey)) {
+        if (StringUtils.isNoneBlank(cacheValue)) {
 
             String cacheCode = cacheValue.split("_")[0];
             //校验验证码
